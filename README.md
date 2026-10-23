@@ -17,6 +17,16 @@ The project is the successor to the original MemsFCR diagnostic application.
 
 Analysis results are indications based on recorded ECU values and thresholds. They are not a replacement for mechanical or electrical diagnosis.
 
+## Differences from the original MemsFCR application
+
+WebMemsFCR keeps the familiar diagnostic concepts from the original application but provides a browser-based interface and a different workflow:
+
+- **Dashboard gauges:** The Dashboard uses radial gauges for RPM, MAP, throttle position, IAC position, battery voltage, coolant and intake-air temperature, lambda voltage, fuel trims, air-fuel ratio, and ignition advance. Gauge scales, coloured operating bands, status LEDs, and hover guidance make the current reading easier to interpret.
+- **CSV replay:** Use **Download Log** to save ECU data and **Import Log** to replay a CSV without connecting to an ECU. Replay runs through the same analysis, fault reporting, dashboard gauges, and charts used for live data.
+- **Charts and history:** Charts use elapsed time starting at zero, retain the imported history, show fault overlays and condition explanations, and support scrolling through older time windows.
+- **Browser and local operation:** The same web interface can use browser serial communication for the hosted application or the Go local server for the desktop executable.
+- **Client-side diagnostics:** Fault conditions are derived in the browser from the decoded ECU data. The CSV contains measurements; fault IDs and explanations are produced during live processing or replay.
+
 ## Using the online application
 
 The hosted application is available at [web.memsfcr.co.uk](https://web.memsfcr.co.uk).
