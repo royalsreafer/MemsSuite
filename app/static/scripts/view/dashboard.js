@@ -5,7 +5,7 @@ const gaugeDefinitions = [
         faultKeys: ["_80x19_CrankshaftPositionSensor"],
         title: "Engine speed",
         units: "RPM",
-        tooltip: "Engine speed is measured by the crankshaft sensor. A warm idle is typically around 800-1,250 RPM; unusually high or missing RPM can indicate an engine or crankshaft-sensor problem.",
+        tooltip: "Measured by the crankshaft sensor.\nExpected warm idle: 800-1,250 RPM.\nUnusually high or missing RPM can indicate an engine or crankshaft-sensor problem.",
         min: 0,
         max: 6000,
         majorTicks: ["0", "1000", "2000", "3000", "4000", "5000", "6000"],
@@ -19,13 +19,13 @@ const gaugeDefinitions = [
         metric: "_80x07_ManifoldAbsolutePressure",
         title: "Manifold pressure",
         units: "kPa",
-        tooltip: "MAP is normally around 30-45 kPa at a warm idle. Higher readings at idle can indicate a vacuum-line problem; the gauge supports turbo readings up to 200 kPa.",
+        tooltip: "Expected warm idle: 30-45 kPa.\nHigher idle readings can indicate a vacuum-line problem.\nAbove 100 kPa is intended for turbocharged engines; the scale supports up to 200 kPa.",
         min: 0,
         max: 200,
         majorTicks: ["0", "20", "40", "60", "80", "100", "120", "140", "160", "180", "200"],
         expected: "Idle: 30-45",
         ranges: [{min: 30, max: 45}],
-        highlights: [{from: 0, to: 10, color: "rgba(225,7,23,.8)"}, {from: 30, to: 45, color: "rgba(26,174,24,.8)"}, {from: 80, to: 200, color: "rgba(225,7,23,.8)"}],
+        highlights: [{from: 0, to: 10, color: "rgba(225,7,23,.8)"}, {from: 30, to: 45, color: "rgba(26,174,24,.8)"}, {from: 100, to: 160, color: "rgba(150,184,255,.8)"}, {from: 160, to: 180, color: "rgba(248,182,69,.8)"}, {from: 180, to: 200, color: "rgba(225,7,23,.8)"}],
         decimals: 0,
     },
     {
@@ -34,7 +34,7 @@ const gaugeDefinitions = [
         faultKeys: ["ThrottlePotCircuitFault"],
         title: "Throttle position",
         units: "%",
-        tooltip: "Throttle position is derived from the throttle-potentiometer voltage. The usual closed-throttle voltage is approximately 0.6-0.9 V.",
+        tooltip: "Derived from the throttle-potentiometer voltage.\nExpected closed-throttle voltage: 0.6-0.9 V.",
         min: 0,
         max: 100,
         majorTicks: ["0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100"],
@@ -49,7 +49,7 @@ const gaugeDefinitions = [
         metric: "_80x12_IACPosition",
         title: "IAC position",
         units: "steps",
-        tooltip: "The IAC stepper position controls idle airflow. A warm idle position is typically around 30-55 steps; values near the upper limit indicate limited correction range.",
+        tooltip: "Controls idle airflow through the IAC stepper motor.\nExpected warm idle: 30-55 steps.\nValues near the upper limit indicate limited correction range.",
         min: 0,
         max: 200,
         majorTicks: ["0", "20", "40", "60", "80", "100", "120", "140", "160", "180", "200"],
@@ -63,7 +63,7 @@ const gaugeDefinitions = [
         metric: "_80x08_BatteryVoltage",
         title: "Battery voltage",
         units: "V",
-        tooltip: "Battery voltage should generally be in the charging range of 12.5-14.5 V while the engine is running. Low or high voltage can indicate a charging-system fault.",
+        tooltip: "Expected charging range while running: 12.5-14.5 V.\nLow or high voltage can indicate a charging-system fault.",
         min: 11,
         max: 16,
         majorTicks: ["11", "12", "13", "14", "15", "16"],
@@ -78,7 +78,7 @@ const gaugeDefinitions = [
         faultKeys: ["CoolantTempSensorFault"],
         title: "Coolant temperature",
         units: "°C",
-        tooltip: "Coolant temperature is used for fuelling and engine-state decisions. Normal operating temperature is approximately 80-95 °C; 95-120 °C is a high-temperature range.",
+        tooltip: "Used for fuelling and engine-state decisions.\nExpected operating range: 80-95 °C.\nHigh-temperature range: 95-120 °C.",
         min: 0,
         max: 120,
         majorTicks: ["0", "10", "20", "30", "40", "50", "60", "70", "80", "90", "100", "110", "120"],
@@ -93,7 +93,7 @@ const gaugeDefinitions = [
         faultKeys: ["IntakeAirTempSensorFault"],
         title: "Intake-air temperature",
         units: "°C",
-        tooltip: "Intake-air temperature is measured before the inlet manifold. A typical reading is around 10-50 °C; higher readings can affect fuelling and indicate heat soak.",
+        tooltip: "Measured before the inlet manifold.\nTypical range: 10-50 °C.\nHigher readings can affect fuelling and indicate heat soak.",
         min: -20,
         max: 80,
         majorTicks: ["-20", "-10", "0", "10", "20", "30", "40", "50", "60", "70", "80"],
@@ -107,7 +107,7 @@ const gaugeDefinitions = [
         metric: "_7Dx06_LambdaVoltage",
         title: "Lambda voltage",
         units: "mV",
-        tooltip: "Lambda voltage indicates oxygen-sensor mixture feedback. The original gauge highlights low, transition, and high-voltage regions across the 0-900 mV range.",
+        tooltip: "Indicates oxygen-sensor mixture feedback.\nScale: 0-900 mV.\nColours show low, transition, and high-voltage regions.",
         min: 0,
         max: 900,
         majorTicks: ["0", "100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -121,7 +121,7 @@ const gaugeDefinitions = [
         metric: "_7Dx0C_ShortTermFuelTrim",
         title: "Short-term fuel trim",
         units: "%",
-        tooltip: "Short-term fuel trim is the ECU's immediate fuelling correction. Values close to zero are generally expected; sustained large corrections can indicate an air, fuel, or sensor problem.",
+        tooltip: "The ECU's immediate fuelling correction.\nValues close to zero are generally expected.\nLarge sustained corrections can indicate an air, fuel, or sensor problem.",
         min: -40,
         max: 40,
         majorTicks: ["-40", "-30", "-20", "-10", "0", "10", "20", "30", "40"],
@@ -135,7 +135,7 @@ const gaugeDefinitions = [
         metric: "_7Dx0B_LongTermFuelTrim",
         title: "Long-term fuel trim",
         units: "%",
-        tooltip: "Long-term fuel trim is the learned fuelling correction. Values close to zero are generally expected; sustained large corrections can indicate a vacuum leak or fuelling problem.",
+        tooltip: "The ECU's learned fuelling correction.\nValues close to zero are generally expected.\nLarge sustained corrections can indicate a vacuum leak or fuelling problem.",
         min: -40,
         max: 40,
         majorTicks: ["-40", "-30", "-20", "-10", "0", "10", "20", "30", "40"],
@@ -149,7 +149,7 @@ const gaugeDefinitions = [
         metric: "_7Dx04_AirFuelRatio",
         title: "Air-fuel ratio",
         units: "",
-        tooltip: "Air-fuel ratio describes the measured mixture. The highlighted stoichiometric region is approximately 13.5-16.5.",
+        tooltip: "Describes the measured air-fuel mixture.\nHighlighted stoichiometric region: 13.5-16.5.",
         min: 10,
         max: 20,
         majorTicks: ["10", "12", "14", "16", "18", "20"],
@@ -163,7 +163,7 @@ const gaugeDefinitions = [
         metric: "_80x16_IgnitionAdvance",
         title: "Ignition advance",
         units: "°",
-        tooltip: "Ignition advance is the timing angle used by the ECU. The typical highlighted range is approximately 8-12 degrees under the conditions represented by this gauge.",
+        tooltip: "Timing angle used by the ECU.\nTypical highlighted range: 8-12° under the conditions represented by this gauge.",
         min: 0,
         max: 20,
         majorTicks: ["0", "5", "10", "15", "20"],
@@ -268,7 +268,20 @@ export function initialise() {
         if (canvas === null || statusElement == null) {
             return;
         }
-        card.title = definition.tooltip;
+        card.dataset.dashboardTooltip = definition.tooltip;
+        card.tabIndex = 0;
+        card.addEventListener("pointermove", (event) => {
+            const tooltipWidth = Math.min(480, window.innerWidth * .9);
+            const left = Math.min(event.clientX + 16, window.innerWidth - tooltipWidth - 8);
+            const top = Math.min(event.clientY + 16, window.innerHeight - 160);
+            card.style.setProperty("--dashboard-tooltip-x", `${Math.max(8, left)}px`);
+            card.style.setProperty("--dashboard-tooltip-y", `${Math.max(8, top)}px`);
+        });
+        card.addEventListener("focus", () => {
+            const bounds = card.getBoundingClientRect();
+            card.style.setProperty("--dashboard-tooltip-x", `${Math.max(8, bounds.left)}px`);
+            card.style.setProperty("--dashboard-tooltip-y", `${Math.max(8, bounds.bottom + 8)}px`);
+        });
 
         const instance = new window.RadialGauge({
             ...gaugeStyle,

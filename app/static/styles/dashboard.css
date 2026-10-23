@@ -11,12 +11,42 @@
 }
 
 .dashboard-gauge {
+    position: relative;
     min-width: 0;
     padding: 1rem .75rem .75rem;
     border: 1px solid #dee2e6;
     border-radius: .5rem;
     background: #fff;
     text-align: center;
+}
+
+.dashboard-gauge::after {
+    position: fixed;
+    z-index: 10;
+    top: var(--dashboard-tooltip-y, 8px);
+    left: var(--dashboard-tooltip-x, 8px);
+    width: min(30rem, 90vw);
+    padding: .65rem .75rem;
+    border-radius: .35rem;
+    color: #fff;
+    background: rgba(33, 37, 41, .96);
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .2);
+    content: attr(data-dashboard-tooltip);
+    font-size: .85rem;
+    font-weight: 400;
+    line-height: 1.4;
+    opacity: 0;
+    pointer-events: none;
+    text-align: left;
+    transform: translateY(-.35rem);
+    transition: opacity .15s ease, transform .15s ease;
+    white-space: pre-line;
+}
+
+.dashboard-gauge:hover::after,
+.dashboard-gauge:focus-within::after {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .radial-gauge {
