@@ -80,13 +80,13 @@ function getMaxChartOffset() {
 }
 
 function updateChartNavigation(maxOffset) {
-    if (chartHistorySlider !== undefined) {
+    if (chartHistorySlider !== null && chartHistorySlider !== undefined) {
         chartHistorySlider.max = maxOffset;
         chartHistorySlider.value = chartViewOffset;
         chartHistorySlider.disabled = maxOffset === 0;
     }
 
-    if (chartHistoryPosition !== undefined) {
+    if (chartHistoryPosition !== null && chartHistoryPosition !== undefined) {
         chartHistoryPosition.textContent = chartViewOffset === 0
             ? "Newest data"
             : `Older data (${chartViewOffset} samples back)`;
