@@ -1,3 +1,4 @@
+import fs from "fs";
 import {beforeEach, describe, expect, it} from "@jest/globals";
 import {Dataframe7d, Dataframe80} from "./mems-dataframe";
 import {DataframeLog} from "./mems-dataframe-log";
@@ -56,6 +57,33 @@ describe('Log MEMS 1.6 dataframes', () => {
         expect(dataframeLog.dataframes).toHaveLength(MIN_DATAFRAMES);
     })
 
+})
+
+describe('Import CSV log', () => {
+    const csv = fs.readFileSync(new URL("../fixtures/test.import-log.csv", import.meta.url), "utf8");
+
+    it('imports every row of an exported log', () => {
+        const dataframes = dataframeLog.importCSV(csv);
+
+        expect(dataframes).toHaveLength(csv.split(/\r?\n/).filter(l => l.trim() !== '').length - 1);
+        expect(dataframeLog.hasLoggedData).toBe(true);
+        expect(dataframes[0]._80x03_CoolantTemp).toBe(19);
+        expect(dataframes[0]._80x0B_AirconSwitch).toBe(false);
+        expect(dataframes[0]._7Dx01_IgnitionSwitch).toBe(true);
+        expect(typeof dataframes[0]._80_RawData).toBe('string');
+    })
+
+    it('round trips through the exporter', () => {
+        dataframeLog.importCSV(csv);
+        const exported = dataframeLog._convertToCSV(dataframeLog.dataframes).split('\r\n');
+
+        expect(exported[0]).toEqual(csv.split(/\r?\n/)[0]);
+        expect(exported[1]).toEqual(csv.split(/\r?\n/)[1]);
+    })
+
+    it('rejects files that are not logs', () => {
+        expect(() => dataframeLog.importCSV('a,b\n1,2')).toThrow();
+    })
 })
 
 function createValidDataframe80() {

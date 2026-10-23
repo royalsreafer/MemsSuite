@@ -60,6 +60,61 @@ export class DataframeLog {
         console.info('exported csv file');
     }
 
+    //
+    // replace the log with the dataframes in a CSV file previously exported by downloadCSVFile
+    // returns the imported dataframes, throws if the file is not a valid log
+    //
+    importCSV(csv) {
+        const dataframes = this._convertFromCSV(csv);
+
+        this.initialise();
+        this._dataframes = dataframes;
+
+        console.info(`imported ${dataframes.length} dataframes from csv`);
+        return dataframes;
+    }
+
+    _convertFromCSV(csv) {
+        const lines = csv.split(/\r?\n/).filter(line => line.trim() !== '');
+        const keys = Object.keys(new Dataframe()).filter(key => key !== '_7Dx00_Time');
+
+        if (lines.length < 2) {
+            throw new Error('the file does not contain any dataframes');
+        }
+
+        const header = lines[0].replace(/^\uFEFF/, '').split(',').map(column => column.trim());
+
+        if (header.length !== CSV_HEADER.length || !CSV_HEADER.every((column, i) => column === header[i])) {
+            throw new Error('the file is not a Web MemsFCR log, the column headings do not match');
+        }
+
+        return lines.slice(1).map((line, row) => {
+            const values = line.split(',');
+
+            if (values.length !== keys.length) {
+                throw new Error(`line ${row + 2} has ${values.length} columns, expected ${keys.length}`);
+            }
+
+            const dataframe = new Dataframe();
+            delete dataframe._7Dx00_Time;
+            keys.forEach((key, i) => {
+                dataframe[key] = this._parseCSVValue(key, values[i].trim());
+            });
+
+            return dataframe;
+        });
+    }
+
+    _parseCSVValue(key, value) {
+        // timestamps and raw hex data must remain as text
+        if (key.endsWith('_Time') || key.endsWith('RawData')) return value;
+        if (value === 'true') return true;
+        if (value === 'false') return false;
+
+        const number = Number(value);
+        return (value === '' || Number.isNaN(number)) ? 0 : number;
+    }
+
     _createDataframe() {
         let dataframe;
 

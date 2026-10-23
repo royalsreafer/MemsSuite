@@ -7,6 +7,14 @@ export class Analysis {
         this._dataframeLog = dataframeLog;
         this._opStatus = new OperationalStatus();
         this._statusLog = [];
+        this._faultHistory = [];
+        this._faultLog = [];
+    }
+
+    reset() {
+        this._opStatus = new OperationalStatus();
+        this._statusLog = [];
+        this._faultHistory = [];
         this._faultLog = [];
     }
 
@@ -36,6 +44,11 @@ export class Analysis {
         if (this._dataframeLog.hasLoggedData) {
             this._opStatus.update(this.dataframes);
             this._statusLog.push(this._opStatus);
+
+            // the status is a single object updated in place, so record the faults seen for each dataframe
+            if (this._opStatus.isInitialised) {
+                this._faultHistory.push({...this._opStatus.operationalFaults});
+            }
         }
     }
 
@@ -51,19 +64,19 @@ export class Analysis {
 
             this._isFaulty("_80x08_BatteryVoltage", Faults.BatteryFault);
             this._isFaulty("_80x17_CoilTime", Faults.CoilFault);
-            this._isFaulty("_80x03_CoolantTemp", Faults.CoolantFault);
+            this._isFaulty("CoolantTempSensorFault", Faults.CoolantFault);
             this._isFaulty("_80x10_IdleHot", Faults.IdleHotFault);
             this._isFaulty("_80x12_IACPosition", Faults.IACFault);
             this._isFaulty("_7Dx1F_JackCount", Faults.JackFault);
             //this._addFault("_7Dx0F_IdleBasePosition", Faults.IdleFault); needs more investigation
             this._isFaulty("IntakeAirTempSensorFault", Faults.AirTempFault);
             this._isFaulty("_80x07_ManifoldAbsolutePressure", Faults.MapFault);
+            this._isFaulty("_80x19_CrankshaftPositionSensor", Faults.CrankshaftFault);
             this._isFaulty("_7Dx06_LambdaVoltage", Faults.O2Fault);
             this._isFaulty("_7Dx09_LambdaStatus", Faults.O2Fault);
             this._isFaulty("ThermostatFaulty", Faults.ThermostatFault);
             this._isFaulty("ThrottlePotCircuitFault", Faults.ThrottleFault);
-            this._isFaulty("FuelPumpFault", Faults.FuelPumpFault);
-            this._isFaulty("IACFault", Faults.ThrottleFault);
+            this._isFaulty("FuelPumpCircuitFault", Faults.FuelPumpFault);
          }
 
         this._faultLog = this._dedupArrayByProperty(this._faultLog, "id");
@@ -121,11 +134,9 @@ export class Analysis {
     _countFaults(metric) {
         let count = 0;
 
-        this._statusLog.forEach((item) => {
-            if (metric in item._operationalFaults) {
-                if (item._operationalFaults[metric]) {
-                    count++;
-                }
+        this._faultHistory.forEach((item) => {
+            if (item[metric]) {
+                count++;
             }
         });
 

@@ -12,6 +12,8 @@ export function attachControlEventListeners() {
     document.getElementById("clearFaultsButton").addEventListener('click', clearFaults);
     document.getElementById("resetECUButton").addEventListener('click', reset);
     document.getElementById("downloadLogButton").addEventListener('click', downloadLog);
+    document.getElementById("importLogButton").addEventListener('click', () => document.getElementById("importLogFile").click());
+    document.getElementById("importLogFile").addEventListener('change', importLog);
     document.getElementById("versionButton").addEventListener('change', selectEcuVersion, false);
     document.getElementById("consoleDebug").addEventListener('change', consoleDebug, false);
 
@@ -91,6 +93,24 @@ function downloadLog() {
     console.info(`download csv`);
 
     dataframeLog.downloadCSVFile(ecu.ecuId);
+}
+
+function importLog(event) {
+    const input = event.target;
+    const file = input.files[0];
+
+    if (file === undefined) return;
+
+    file.text().then((csv) => {
+        const count = Dataframe.importDataframes(csv);
+        View.showToast(`Imported ${count} dataframes from ${file.name}`);
+    }).catch((error) => {
+        console.error(`import log ${error}`);
+        View.showToast(`Unable to import log: ${error.message}`);
+    }).finally(() => {
+        // allow the same file to be selected again
+        input.value = '';
+    });
 }
 
 function showConnectErrorDialog() {

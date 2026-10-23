@@ -8,15 +8,141 @@ const skipped = (ctx, value) => ctx.p0.skip || ctx.p0.parsed.y === 0 ? value : u
 const faulty = (ctx, value) => ctx.p0.parsed.y > 0 ? value : undefined;
 
 var faultsArray = {}
+let firstChartTime;
+let chartViewOffset = 0;
+let chartHistorySlider;
+let chartHistoryPosition;
+
+function formatChartValue(value) {
+    if (typeof value !== "number" || !Number.isFinite(value)) {
+        return value;
+    }
+
+    return value.toLocaleString(undefined, {
+        maximumFractionDigits: 2,
+    });
+}
+
+function formatElapsedTime(value) {
+    if (typeof value !== "number" || !Number.isFinite(value)) {
+        return value;
+    }
+
+    const seconds = Math.max(0, Math.round(value * 10) / 10);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+
+    if (minutes === 0) {
+        return `${seconds}s`;
+    }
+
+    return `${minutes}m ${String(remainingSeconds).padStart(2, "0")}s`;
+}
+
+function getElapsedTime(value) {
+    const timestamp = new Date(String(value).replace(" ", "T")).getTime();
+    if (Number.isNaN(timestamp)) {
+        return 0;
+    }
+
+    if (firstChartTime === undefined) {
+        firstChartTime = timestamp;
+    }
+
+    return Math.max(0, (timestamp - firstChartTime) / 1000);
+}
+
+export function resetChartTime() {
+    firstChartTime = undefined;
+    chartViewOffset = 0;
+}
+
+function scrollCharts(event) {
+    const maxOffset = getMaxChartOffset();
+
+    if (maxOffset === 0) {
+        return;
+    }
+
+    event.preventDefault();
+    chartViewOffset = Math.max(
+        0,
+        Math.min(maxOffset, chartViewOffset + Math.sign(event.deltaY) * 10)
+    );
+    refreshCharts();
+}
+
+function getMaxChartOffset() {
+    return charts.reduce((maximum, chart) => {
+        const historyLength = chart._history?.labels.length || 0;
+        return Math.max(maximum, historyLength - chartLength);
+    }, 0);
+}
+
+function updateChartNavigation(maxOffset) {
+    if (chartHistorySlider !== undefined) {
+        chartHistorySlider.max = maxOffset;
+        chartHistorySlider.value = chartViewOffset;
+        chartHistorySlider.disabled = maxOffset === 0;
+    }
+
+    if (chartHistoryPosition !== undefined) {
+        chartHistoryPosition.textContent = chartViewOffset === 0
+            ? "Newest data"
+            : `Older data (${chartViewOffset} samples back)`;
+    }
+}
+
+function renderChartWindow(chart) {
+    if (chart._history === undefined) {
+        return;
+    }
+
+    const end = Math.max(0, chart._history.labels.length - chartViewOffset);
+    const start = Math.max(0, end - chartLength);
+
+    chart.data.labels = chart._history.labels.slice(start, end);
+    chart.data.datasets[0].data = chart._history.data.slice(start, end);
+    chart.data.datasets[1].data = chart._history.faults.slice(start, end);
+}
+
+const faultConditions = {
+    "_80x07_ManifoldAbsolutePressure": "At idle, MAP is above 42 kPa.",
+    "_80x08_BatteryVoltage": "Battery voltage is low and the battery is not charging.",
+    "_80x10_IdleHot": "Warm idle value is outside the expected 10-55 range.",
+    "_80x12_IACPosition": "Warm idle IAC position is outside 30-55 steps, or the IAC cannot correct a large idle offset.",
+    "_80x19_CrankshaftPositionSensor": "The engine is running but the crankshaft sensor value is invalid.",
+    "_7Dx06_LambdaVoltage": "Lambda voltage is outside 10-900 mV or is not oscillating as expected.",
+    "_7Dx09_LambdaStatus": "The O2 system is inactive, out of range, or not oscillating as expected.",
+    "_7Dx0F_IdleBasePosition": "Idle-base condition: cold below 45, warm above 50, or a 30-sample mean above 100 steps.",
+    "_7Dx1F_JackCount": "Jack count is at least 100 steps.",
+    "CoolantTempSensorFault": "The ECU reports a coolant-temperature sensor fault.",
+    "IntakeAirTempSensorFault": "The ECU reports an intake-air temperature sensor fault.",
+    "FuelPumpCircuitFault": "The ECU reports a fuel-pump circuit fault.",
+    "ThrottlePotCircuitFault": "The ECU reports a throttle-potentiometer circuit fault.",
+};
+
+function getFaultCondition(metricId) {
+    return faultConditions[metricId] || "The value was outside the expected operating conditions.";
+}
 
 export function createCharts() {
+    chartHistorySlider = document.getElementById("chart-history-slider");
+    chartHistoryPosition = document.getElementById("chart-history-position");
+    chartHistorySlider?.addEventListener("input", (event) => {
+        chartViewOffset = Number(event.target.value);
+        refreshCharts();
+    });
+
     let chart = document.querySelectorAll(`.${Identifier.ecuDataChart}`);
     for (let i = 0; i < chart.length; i++) {
         const chartCtx = chart[i];
         const chartId = `${chart[i].className}`; //`${chart[i].id}_graph_${Math.floor(Math.random() * 100)}`;
         const chartTitle = `${chartCtx.title}`;
+        const metricId = chartCtx.classList[1];
 
-        const graph = createChart(chartCtx, chartId, chartTitle);
+        const graph = createChart(chartCtx, chartId, chartTitle, metricId);
+        chartCtx.addEventListener("wheel", scrollCharts, {passive: false});
         charts.push(graph);
     }
 }
@@ -32,19 +158,25 @@ export function createSparks() {
     }
 }
 
-export function updateCharts(df, chartFaults) {
-    console.debug(`start chart at ${new Date().getTime()}`);
+export function updateCharts(df, chartFaults, render = true) {
+    if (render) {
+        console.debug(`start chart at ${new Date().getTime()}`);
+    }
     let time = df[Identifier.ecuDataTimeMetric80];
     if (time === undefined) {
         time = df[Identifier.ecuDataTimeMetric7d];
     }
+    const elapsedTime = getElapsedTime(time);
 
     Object.entries(df).forEach((entry) => {
         const [id, value] = entry;
         const fault = _hasFault(id, chartFaults);
-        _updateCharts(id,time,value,fault);
+        _updateCharts(id,elapsedTime,value,fault,render);
     });
-    console.debug(`finish chart at ${new Date().getTime()}`);
+    updateChartNavigation(getMaxChartOffset());
+    if (render) {
+        console.debug(`finish chart at ${new Date().getTime()}`);
+    }
 }
 
 function _hasFault(id, faults) {
@@ -55,36 +187,47 @@ function _hasFault(id, faults) {
     return false;
 }
 
-function _updateCharts(id, time, value, fault) {
+function _updateCharts(id, time, value, fault, render) {
     const chartId = `${Identifier.ecuDataChart} ${id}`;
     const chart = findChart(chartId);
     if (chart !== undefined) {
         // update the main graph
-        _addDataToChart(chart, time, value, fault);
+        _addDataToChart(chart, time, value, fault, render);
     }
 
     const sparkId = `${Identifier.ecuDataSpark} ${id}`;
     const spark = findChart(sparkId);
     if (spark !== undefined) {
         // update the spark
-        _addDataToChart(spark, time, value, fault);
+        _addDataToChart(spark, time, value, fault, render);
     }
 }
 
-function _addDataToChart(chart, time, value, fault) {
+function _addDataToChart(chart, time, value, fault, render) {
     if (chart !== undefined) {
-        addData(chart, time, value, fault);
+        addData(chart, time, value, fault, render);
     }
 }
 
-function createChart(ctx, id, title) {
-    return new Chart(ctx, {
+export function refreshCharts() {
+    const maxOffset = getMaxChartOffset();
+    chartViewOffset = Math.min(chartViewOffset, maxOffset);
+    updateChartNavigation(maxOffset);
+
+    charts.forEach((chart) => {
+        renderChartWindow(chart);
+        chart.update('none');
+    });
+}
+
+function createChart(ctx, id, title, metricId) {
+    const chart = new Chart(ctx, {
         id: id,
         type: 'line',
         data: {
-            labels: Array.apply(null, Array(chartLength)).map(function() { return '' }),
+            labels: [],
             datasets: [{
-                data: Array.apply(null, Array(chartLength)).map(function() { return 0 }),
+                data: [],
                 cubicInterpolationMode: 'monotone',
                 tension: 0,
                 borderColor: 'rgba(102,102,255,1)',
@@ -95,7 +238,7 @@ function createChart(ctx, id, title) {
                 fill: true,
             },
                 {
-                    data: Array.apply(null, Array(chartLength)).map(function() { return 0 }),
+                    data: [],
                     cubicInterpolationMode: 'monotone',
                     tension: 0,
                     borderWidth: 2,
@@ -108,19 +251,44 @@ function createChart(ctx, id, title) {
         },
         elements: {
             point: {
-                radius: 0 // default to disabled in all datasets
+                radius: 0,
+                hitRadius: 12,
+                hoverRadius: 4,
             }
         },
         options: {
             normalized: true,
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+                mode: "index",
+                intersect: false,
+            },
             spanGaps: true,
             radius: 0,
             animation: {
                 duration: 0
             },
             plugins: {
+                tooltip: {
+                    filter: (item) => item.datasetIndex === 0,
+                    callbacks: {
+                        title: (items) => formatElapsedTime(Number(items[0].label)),
+                        label: (item) => `${title}: ${formatChartValue(item.parsed.y)}`,
+                        footer: (items) => {
+                            const item = items[0];
+                            const faultValue = item.chart.data.datasets[1]?.data[item.dataIndex];
+                            if (typeof faultValue !== "number" || !Number.isFinite(faultValue) || faultValue <= 0) {
+                                return "Status: within expected conditions";
+                            }
+
+                            return [
+                                "Status: potential fault",
+                                getFaultCondition(metricId),
+                            ];
+                        },
+                    },
+                },
                 legend: {
                     display: false,
                 },
@@ -154,22 +322,39 @@ function createChart(ctx, id, title) {
                         display: false
                     },
                     ticks: {
-                        display:false
+                        autoSkip: true,
+                        maxTicksLimit: 6,
+                        maxRotation: 0,
+                        minRotation: 0,
+                        callback: function(value) {
+                            return formatElapsedTime(Number(this.getLabelForValue(value)));
+                        },
+                    },
+                    title: {
+                        display: true,
+                        text: "Time",
                     },
                 }
             },
         }
     });
+
+    chart._history = {
+        labels: [],
+        data: [],
+        faults: [],
+    };
+    return chart;
 }
 
 function createSpark(ctx, id) {
-    return new Chart(ctx, {
+    const chart = new Chart(ctx, {
         id: id,
         type: 'line',
         data: {
-            labels: Array.apply(null, Array(sparkLength)).map(function() { return '' }),
+            labels: [],
             datasets: [{
-                data: Array.apply(null, Array(sparkLength)).map(function() { return 0 }),
+                data: [],
                 borderColor: 'rgba(102,102,255,0.9)',
                 //backgroundColor: 'rgba(102,153,204,0.1)',
                 fillColor: "rgba(102,153,51,0.2)",
@@ -179,7 +364,7 @@ function createSpark(ctx, id) {
                 tension: 0,
                 fill: true,
             },{
-                data: Array.apply(null, Array(sparkLength)).map(function() { return 0 }),
+                data: [],
                 cubicInterpolationMode: 'monotone',
                 tension: 0,
                 borderWidth: 1,
@@ -233,6 +418,13 @@ function createSpark(ctx, id) {
             }
         },
     });
+
+    chart._history = {
+        labels: [],
+        data: [],
+        faults: [],
+    };
+    return chart;
 }
 
 export async function getChartAsImage(id) {
@@ -246,37 +438,23 @@ export async function getChartAsImage(id) {
     }
 }
 
-export function addData(chart, label, data, fault) {
-    chart.data.labels.shift()
-    chart.data.labels.push(label);
-    chart.data.datasets[0].data.push(data)
-    chart.data.datasets[0].data.shift()
-
-    if (chart.data.datasets.length === 1) {
-        chart.data.datasets.push(
-            {data: Array.apply(null, Array(chart.data.datasets[0].data.length)).map(function() { return 0 })}
-        )
+export function addData(chart, label, data, fault, render = true) {
+    if (chart._history === undefined) {
+        chart._history = {
+            labels: [],
+            data: [],
+            faults: [],
+        };
     }
 
-    shiftAnnotations(chart)
+    chart._history.labels.push(label);
+    chart._history.data.push(data);
+    chart._history.faults.push(fault === true ? data : NaN);
 
-    if (fault === true) {
-        // draw faulty line at same datapoint
-        //if (isNewFault(chart)) {
-        //    addAnnotation(chart, chart.data.datasets[0].data.length - 1, data)
-        //}
-        chart.data.datasets[1].data.push(data)
-    } else {
-        // if the previous data value in the fault line has a value then push a NaN to give a clean cutoff in the fill
-        if (chart.data.datasets[1].data[chart.data.datasets[1].data.length - 1] > 0){
-            chart.data.datasets[1].data.push(NaN)
-        } else {
-            chart.data.datasets[1].data.push(0)
-        }
+    if (render) {
+        renderChartWindow(chart);
+        chart.update('none');
     }
-    chart.data.datasets[1].data.shift()
-
-    chart.update('none');
 }
 
 export function findChart(id) {
@@ -371,5 +549,3 @@ function isNewFault(chart) {
         return true
     }
 }
-
-

@@ -45,6 +45,41 @@ export function dataframeReceived(ecuResponse) {
     Chart.updateCharts(df, currentFaults);
 }
 
+//
+// replay an imported log through the analysis, charts and dashboard as if it had been received from the ecu
+//
+export function importDataframes(csv) {
+    const dataframes = dataframeLog.importCSV(csv);
+
+    analysis.reset();
+    analysisReport.updateFaultPill();
+    Chart.resetChartTime();
+    dataframeLog._dataframes = [];
+
+    dataframes.forEach((df, i) => {
+        // analyse progressively so the status log mirrors a live session
+        dataframeLog._dataframes.push(df);
+        analysis.analyse();
+        Chart.updateCharts(df, analysis.status.at(-1)?.operationalFaults, false);
+    });
+    dataframeLog._dataframes = dataframes;
+    Chart.refreshCharts();
+
+    const last = dataframes.at(-1);
+    const currentStatus = analysis.status.at(-1);
+
+    analysisReport.updateFaultPill();
+    View.setButtonsWhenDataHasBeenLogged();
+    updateDataframeMetrics(last);
+
+    if (currentStatus !== undefined) {
+        updateState(last, currentStatus);
+        colouriseFaults(currentStatus.operationalFaults);
+    }
+
+    return dataframes.length;
+}
+
 function colouriseFaults(faults) {
     if (faults !== undefined) {
         Object.entries(faults).forEach((fault) => {

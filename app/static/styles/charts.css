@@ -48,17 +48,29 @@
 
 .chart-container {
     position: relative;
-    height: 150px;
+    height: clamp(180px, 28vw, 280px);
+    min-height: 180px;
     width: 100%;
-    /*background-color: rgba(221, 221, 221, 0.05);*/
     padding: 3px;
-    margin: 3px;
+    margin: 3px 0;
+}
+
+.chart-container canvas {
+    display: block;
+    max-width: 100%;
+}
+
+.chart-navigation {
+    position: sticky;
+    top: 0;
+    z-index: 2;
 }
 
 .ecuchart {
     position: relative;
-    height:150px;
+    height: 100%;
     width: 100%;
+    cursor: ew-resize;
 }
 
 .spark-container {

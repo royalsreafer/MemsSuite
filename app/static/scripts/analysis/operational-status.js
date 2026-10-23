@@ -33,6 +33,10 @@ export class OperationalStatus {
         }
     }
 
+    get isInitialised() {
+        return this._initialised === true;
+    }
+
     get dataframes() {
         return this._dataframes;
     }
@@ -210,7 +214,7 @@ export class OperationalStatus {
     }
 
     get isCrankshaftSensorFaulty() {
-        return this._dataframe._80x19_CrankshaftPositionSensor === Constant.INVALID_CRANKSHAFT_POSITION_SENSOR;
+        return this.isEngineRunning && this._dataframe._80x19_CrankshaftPositionSensor === Constant.INVALID_CRANKSHAFT_POSITION_SENSOR;
     }
 
     get isThermostatFaulty() {
@@ -257,7 +261,7 @@ export class OperationalStatus {
     get isIdleSpeedFaulty() {
         if (this.isEngineRunning) {
             let sum = 0;
-            let sample = this._dataframes.slice(-Constant.SAMPLE_SIZE);
+            let sample = this._dataframes.slice(-Constant.IDLE_SPEED_SAMPLE_SIZE);
 
             sample.forEach((item) => {
                 sum += item._7Dx0F_IdleBasePosition;

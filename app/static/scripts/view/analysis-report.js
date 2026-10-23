@@ -112,11 +112,7 @@ export class AnalysisReport {
     }
 
     _hasFault(id) {
-        this.analysis.faults.find(obj => {
-            return obj.id === id;
-        })
-
-        return false;
+        return this.analysis.faults.some(obj => obj.id === id);
     }
 
     _displayElement(metric) {
