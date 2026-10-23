@@ -1,0 +1,180 @@
+.dashboard-intro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
+.dashboard-gauges {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.dashboard-gauge {
+    min-width: 0;
+    padding: 1rem .75rem .75rem;
+    border: 1px solid #dee2e6;
+    border-radius: .5rem;
+    background: #fff;
+    text-align: center;
+}
+
+.radial-gauge {
+    display: block;
+    width: min(100%, 220px);
+    height: auto;
+    margin: 0 auto;
+}
+
+.gauge-indicators {
+    min-height: 1.2rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .75rem;
+    margin-top: .5rem;
+    color: #6c757d;
+    font-size: .8rem;
+}
+
+.status-led {
+    display: inline-block;
+    width: .7rem;
+    height: .7rem;
+    margin-right: .25rem;
+    border: 1px solid #6c757d;
+    border-radius: 50%;
+    background: #adb5bd;
+    vertical-align: -1px;
+}
+
+.status-led.is-on {
+    border-color: #146c2e;
+    background: #198754;
+    box-shadow: 0 0 5px rgba(25, 135, 84, .7);
+}
+
+.status-led.is-fault {
+    border-color: #842029;
+    background: #dc3545;
+    box-shadow: 0 0 5px rgba(220, 53, 69, .7);
+}
+
+.gauge-title {
+    min-height: 2.5rem;
+    font-weight: 600;
+}
+
+.gauge-units {
+    color: #6c757d;
+    font-size: .85rem;
+    font-weight: 400;
+}
+
+.gauge-dial {
+    display: flex;
+    justify-content: center;
+    padding: .25rem 0 0;
+}
+
+.gauge-scale {
+    --gauge-needle-angle: -120deg;
+    --gauge-expected-start: 0deg;
+    --gauge-expected-end: 0deg;
+    position: relative;
+    width: min(100%, 210px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+        conic-gradient(from 240deg at 50% 50%,
+            #dc3545 0deg 30deg,
+            #e9ecef 30deg 210deg,
+            #dc3545 210deg 240deg);
+    clip-path: polygon(0 0, 100% 0, 100% 72%, 50% 100%, 0 72%);
+}
+
+.gauge-scale::before {
+    content: "";
+    position: absolute;
+    inset: 9%;
+    border-radius: 50%;
+    background: #212529;
+}
+
+.gauge-expected-band {
+    position: absolute;
+    z-index: 1;
+    inset: 5%;
+    border-radius: 50%;
+    background: conic-gradient(from 240deg,
+        transparent 0deg var(--gauge-expected-start),
+        #72c472 var(--gauge-expected-start) var(--gauge-expected-end),
+        transparent var(--gauge-expected-end) 240deg);
+    opacity: .75;
+}
+
+.gauge-needle {
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    bottom: 19%;
+    width: 3px;
+    height: 37%;
+    border-radius: 3px;
+    background: #f8f9fa;
+    transform-origin: 50% 100%;
+    transform: translateX(-50%) rotate(var(--gauge-needle-angle));
+    transition: transform .25s ease-out;
+}
+
+.gauge-center {
+    position: absolute;
+    z-index: 3;
+    left: 50%;
+    bottom: 17%;
+    width: 14px;
+    height: 14px;
+    border: 3px solid #f8f9fa;
+    border-radius: 50%;
+    background: #495057;
+    transform: translateX(-50%);
+}
+
+.gauge-value {
+    position: absolute;
+    z-index: 4;
+    right: 0;
+    bottom: 4%;
+    left: 0;
+    color: #f8f9fa;
+    font-size: clamp(1rem, 3vw, 1.35rem);
+    font-variant-numeric: tabular-nums;
+}
+
+.gauge-status {
+    margin-top: .75rem;
+    padding: .25rem .5rem;
+    border-radius: .25rem;
+    font-size: .85rem;
+    font-weight: 600;
+}
+
+.gauge-status.is-unknown {
+    color: #6c757d;
+    background: #f1f3f5;
+}
+
+.gauge-status.is-expected {
+    color: #146c2e;
+    background: #d1e7dd;
+}
+
+.gauge-status.is-outside {
+    color: #664d03;
+    background: #fff3cd;
+}
+
+.gauge-status.is-fault {
+    color: #842029;
+    background: #f8d7da;
+}

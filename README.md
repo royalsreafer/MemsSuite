@@ -9,6 +9,7 @@ The project is the successor to the original MemsFCR diagnostic application.
 - Connects to supported Rover MEMS ECUs over a serial diagnostic cable.
 - Displays ECU sensor and operating values.
 - Reports potential sensor, idle, lambda/O2, battery, MAP, IAC, and other faults.
+- Provides a native dashboard with current-value gauges, min/max limits, and expected operating ranges.
 - Shows live charts with elapsed time, fault highlighting, and historical scrolling.
 - Exports ECU data as CSV.
 - Imports a previously exported CSV log for replay and analysis.

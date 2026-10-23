@@ -1,339 +1,86 @@
-<div class="container">
+<div class="dashboard-intro alert alert-light border">
+    <strong>Live dashboard</strong>
+    <span>Gauges show the current ECU reading. Coloured bands indicate expected or warning ranges for the condition shown; detailed fault rules remain available on the Analysis tab.</span>
+</div>
 
-	<div class="row row-cols-4 mt-2 mb-4">
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault__80x01_EngineRPM">Engine RPM</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata__80x01_EngineRPM">&nbsp;</div>
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col">
-					<div class="col dashboard-chart-container"><canvas title="Engine RPM" class="ecuspark _80x01_EngineRPM" height="150"></canvas></div>
-				</div>
-			</div>
-
-		</div>
-
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault__80x09_ThrottlePotSensor">Throttle Position</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata__80x09_ThrottlePotSensor">&nbsp;</div>
-				</div>
-
-				<div class="col col-4">
-					V
-				</div>
-
-			</div>
-
-			<div class="row">
-				<div class="col">
-					<div class="col dashboard-chart-container"><canvas title="Throttle Position" class="ecuspark _80x09_ThrottlePotSensor" height="150"></canvas></div>
-				</div>
-			</div>
-		</div>
-
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault_EngineIdle">Engine Status</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata_EngineIdle">Off&nbsp;</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault__80x12_IACPosition">IAC Position</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata__80x12_IACPosition">&nbsp;</div>
-				</div>
-
-				<div class="col col-4">
-					Steps
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="row row-cols-4 mt-2 mb-4">
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault__80x03_CoolantTemp">Coolant Temp</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata__80x03_CoolantTemp">&nbsp;</div>
-				</div>
-				<div class="col col-4">
-					°C
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col">
-					<div class="col dashboard-chart-container"><canvas title="Coolant Temp" class="ecuspark _80x03_CoolantTemp" height="150"></canvas></div>
-				</div>
-			</div>
-		</div>
-
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault__80x05_IntakeAirTemp">Intake Air Temp</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata__80x05_IntakeAirTemp">&nbsp;</div>
-				</div>
-				<div class="col col-4">
-					°C
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col">
-					<div class="col dashboard-chart-container"><canvas title="Intake Air Temp" class="ecuspark _80x05_IntakeAirTemp" height="150"></canvas></div>
-				</div>
-			</div>
-		</div>
-
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault__80x08_BatteryVoltage">Battery</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata__80x08_BatteryVoltage">&nbsp;</div>
-				</div>
-
-				<div class="col col-4">
-					°C
-				</div>
-			</div>
-		</div>
-
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault__80x16_IgnitionAdvance">Ignition Advance</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata__80x16_IgnitionAdvance">&nbsp;</div>
-				</div>
-				<div class="col col-4">
-					°
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="row row-cols-4 mt-2 mb-4">
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault__80x07_ManifoldAbsolutePressure">MAP</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata__80x07_ManifoldAbsolutePressure">&nbsp;</div>
-				</div>
-				<div class="col col-4">
-					kPa
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col">
-					<div class="col dashboard-chart-container"><canvas title="MAP" class="ecuspark _80x07_ManifoldAbsolutePressure" height="150"></canvas></div>
-				</div>
-			</div>
-		</div>
-
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault__7Dx06_LambdaVoltage">Lambda Voltage</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata__7Dx06_LambdaVoltage">&nbsp;</div>
-				</div>
-				<div class="col col-4">
-					mV
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col">
-					<div class="col dashboard-chart-container"><canvas title="Lambda Voltage" class="ecuspark _7Dx06_LambdaVoltage" height="150"></canvas></div>
-				</div>
-			</div>
-		</div>
-
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault__7Dx0A_ClosedLoop">Loop Status</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata__7Dx0A_ClosedLoop">-&nbsp;</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault__7Dx09_LambdaStatus">O2 System Active</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata__7Dx09_LambdaStatus">Inactive&nbsp;</div>
-				</div>
-				<div class="col col-4">
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="row row-cols-4 mt-2 mb-4">
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault__7Dx0C_ShortTermFuelTrim">Short Term Fuel Trim</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata__7Dx0C_ShortTermFuelTrim">&nbsp;</div>
-				</div>
-				<div class="col col-4">
-					%
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col">
-					<div class="col dashboard-chart-container"><canvas title="Short Term Fuel Trim" class="ecuspark _7Dx0C_ShortTermFuelTrim" height="150"></canvas></div>
-				</div>
-			</div>
-		</div>
-
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault__7Dx0B_LongTermFuelTrim">Long Term Fuel Trim</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata__7Dx0B_LongTermFuelTrim">&nbsp;</div>
-				</div>
-				<div class="col col-4">
-					%
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col">
-					<div class="col dashboard-chart-container"><canvas title="Long Term Fuel Trim" class="ecuspark _7Dx0B_LongTermFuelTrim" height="150"></canvas></div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="row row-cols-4 mt-2 mb-4">
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault_CoolantTempSensorFault">Coolant Sensor Fault</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata_CoolantTempSensorFault">-&nbsp;</div>
-				</div>
-				<div class="col col-4">
-				</div>
-			</div>
-		</div>
-
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault_IntakeAirTempSensorFault">Intake Temperature Sensor Fault</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata_IntakeAirTempSensorFault">-&nbsp;</div>
-				</div>
-				<div class="col col-4">
-				</div>
-			</div>
-		</div>
-
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault_FuelPumpCircuitFault">Fuel Pump Circuit Fault</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata_FuelPumpCircuitFault">-&nbsp;</div>
-				</div>
-				<div class="col col-4">
-				</div>
-			</div>
-		</div>
-
-		<div class="col">
-			<div class="row">
-				<div class="col">
-					<div class="text-black-50 fault_ThrottlePotCircuitFault">Throttle Pot. Circuit Fault</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<div class="fs-1 ecudata_ThrottlePotCircuitFault">-&nbsp;</div>
-				</div>
-				<div class="col col-4">
-				</div>
-			</div>
-		</div>
-	</div>
+<div class="dashboard-gauges">
+    <div class="dashboard-gauge">
+        <div class="gauge-title">Engine speed <span class="gauge-units">RPM</span></div>
+        <canvas id="gauge-engine-rpm" data-gauge-id="engine-rpm" class="radial-gauge" aria-label="Engine speed gauge"></canvas>
+        <div class="gauge-indicators">
+            <span><span id="dashboard-engine-running" class="status-led is-off"></span>Engine running</span>
+            <span><span id="dashboard-crankshaft-fault" class="status-led is-off"></span>Crankshaft fault</span>
+        </div>
+        <div class="gauge-status is-unknown">Waiting for data</div>
+    </div>
+    <div class="dashboard-gauge">
+        <div class="gauge-title">Manifold pressure <span class="gauge-units">kPa</span></div>
+        <canvas id="gauge-map" data-gauge-id="map" class="radial-gauge" aria-label="Manifold pressure gauge"></canvas>
+        <div class="gauge-indicators">
+            <span><span id="dashboard-map-fault" class="status-led is-off"></span>MAP fault</span>
+        </div>
+        <div class="gauge-status is-unknown">Waiting for data</div>
+    </div>
+    <div class="dashboard-gauge">
+        <div class="gauge-title">Throttle position <span class="gauge-units">%</span></div>
+        <canvas id="gauge-throttle" data-gauge-id="throttle" class="radial-gauge" aria-label="Throttle position gauge"></canvas>
+        <div class="gauge-indicators" aria-hidden="true"></div>
+        <div class="gauge-status is-unknown">Waiting for data</div>
+    </div>
+    <div class="dashboard-gauge">
+        <div class="gauge-title">IAC position <span class="gauge-units">steps</span></div>
+        <canvas id="gauge-iac" data-gauge-id="iac" class="radial-gauge" aria-label="IAC position gauge"></canvas>
+        <div class="gauge-indicators" aria-hidden="true"></div>
+        <div class="gauge-status is-unknown">Waiting for data</div>
+    </div>
+    <div class="dashboard-gauge">
+        <div class="gauge-title">Battery voltage <span class="gauge-units">V</span></div>
+        <canvas id="gauge-battery" data-gauge-id="battery" class="radial-gauge" aria-label="Battery voltage gauge"></canvas>
+        <div class="gauge-indicators" aria-hidden="true"></div>
+        <div class="gauge-status is-unknown">Waiting for data</div>
+    </div>
+    <div class="dashboard-gauge">
+        <div class="gauge-title">Coolant temperature <span class="gauge-units">°C</span></div>
+        <canvas id="gauge-coolant" data-gauge-id="coolant" class="radial-gauge" aria-label="Coolant temperature gauge"></canvas>
+        <div class="gauge-indicators" aria-hidden="true"></div>
+        <div class="gauge-status is-unknown">Waiting for data</div>
+    </div>
+    <div class="dashboard-gauge">
+        <div class="gauge-title">Intake-air temperature <span class="gauge-units">°C</span></div>
+        <canvas id="gauge-intake-air" data-gauge-id="intake-air" class="radial-gauge" aria-label="Intake-air temperature gauge"></canvas>
+        <div class="gauge-indicators" aria-hidden="true"></div>
+        <div class="gauge-status is-unknown">Waiting for data</div>
+    </div>
+    <div class="dashboard-gauge">
+        <div class="gauge-title">Lambda voltage <span class="gauge-units">mV</span></div>
+        <canvas id="gauge-lambda" data-gauge-id="lambda" class="radial-gauge" aria-label="Lambda voltage gauge"></canvas>
+        <div class="gauge-indicators">
+            <span><span id="dashboard-lambda-loop" class="status-led is-off"></span>Closed loop</span>
+        </div>
+        <div class="gauge-status is-unknown">Waiting for data</div>
+    </div>
+    <div class="dashboard-gauge">
+        <div class="gauge-title">Short-term fuel trim <span class="gauge-units">%</span></div>
+        <canvas id="gauge-short-term-fuel-trim" data-gauge-id="short-term-fuel-trim" class="radial-gauge" aria-label="Short-term fuel trim gauge"></canvas>
+        <div class="gauge-indicators" aria-hidden="true"></div>
+        <div class="gauge-status is-unknown">Waiting for data</div>
+    </div>
+    <div class="dashboard-gauge">
+        <div class="gauge-title">Long-term fuel trim <span class="gauge-units">%</span></div>
+        <canvas id="gauge-long-term-fuel-trim" data-gauge-id="long-term-fuel-trim" class="radial-gauge" aria-label="Long-term fuel trim gauge"></canvas>
+        <div class="gauge-indicators" aria-hidden="true"></div>
+        <div class="gauge-status is-unknown">Waiting for data</div>
+    </div>
+    <div class="dashboard-gauge">
+        <div class="gauge-title">Air-fuel ratio</div>
+        <canvas id="gauge-air-fuel-ratio" data-gauge-id="air-fuel-ratio" class="radial-gauge" aria-label="Air-fuel ratio gauge"></canvas>
+        <div class="gauge-indicators" aria-hidden="true"></div>
+        <div class="gauge-status is-unknown">Waiting for data</div>
+    </div>
+    <div class="dashboard-gauge">
+        <div class="gauge-title">Ignition advance <span class="gauge-units">°</span></div>
+        <canvas id="gauge-ignition-advance" data-gauge-id="ignition-advance" class="radial-gauge" aria-label="Ignition advance gauge"></canvas>
+        <div class="gauge-indicators" aria-hidden="true"></div>
+        <div class="gauge-status is-unknown">Waiting for data</div>
+    </div>
 </div>

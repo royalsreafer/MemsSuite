@@ -1,5 +1,6 @@
 import * as View from "./view.js";
 import * as Chart from "./charts.js";
+import * as Dashboard from "./dashboard.js";
 import * as Identifier from "./identifiers.js";
 import {dataframeLog, ecu, analysis, analysisReport} from "./init.js";
 
@@ -43,6 +44,7 @@ export function dataframeReceived(ecuResponse) {
 
     // update the charts
     Chart.updateCharts(df, currentFaults);
+    Dashboard.update(df, currentFaults, currentStatus);
 }
 
 //
@@ -75,6 +77,9 @@ export function importDataframes(csv) {
     if (currentStatus !== undefined) {
         updateState(last, currentStatus);
         colouriseFaults(currentStatus.operationalFaults);
+        Dashboard.update(last, currentStatus.operationalFaults, currentStatus);
+    } else {
+        Dashboard.update(last);
     }
 
     return dataframes.length;

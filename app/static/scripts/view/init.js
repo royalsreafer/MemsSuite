@@ -11,6 +11,7 @@ import * as Actuator from "./actuators.js";
 import * as Adjustment from "./adjustments.js";
 import * as Controls from "./controls.js";
 import * as Chart from "./charts.js";
+import * as Dashboard from "./dashboard.js";
 import * as View from "./view.js";
 
 export const responseEventQueue = new EventQueue();
@@ -41,6 +42,7 @@ export async function initialise(serialInterface) {
         // causing serial errors.
         Chart.createCharts();
         Chart.createSparks();
+        Dashboard.initialise();
 
         View.showTab('nav-dashboard-tab');
 
@@ -69,18 +71,17 @@ export async function loadTemplates() {
         templateUrls.push(url);
     }
 
-    for (let i=0; i < templates.length; i++) {
-        await fetch(templateUrls[i])
-            .then((response) =>{
-                response.text().then((text) => {
-                    let target = document.getElementById(`template-${templates[i]}`);
-                    if (target !== null) {
-                        target.innerHTML = text;
-                    }
-                });
-            })
-            .catch(function(err) {console.warn(`Failed to fetch template ${templateUrls[i]} (${err})`);
-            });
+    for (let i = 0; i < templates.length; i++) {
+        try {
+            const response = await fetch(templateUrls[i]);
+            const text = await response.text();
+            const target = document.getElementById(`template-${templates[i]}`);
+            if (target !== null) {
+                target.innerHTML = text;
+            }
+        } catch (err) {
+            console.warn(`Failed to fetch template ${templateUrls[i]} (${err})`);
+        }
     }
 }
 
