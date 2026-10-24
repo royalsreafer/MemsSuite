@@ -13,6 +13,7 @@ import * as Controls from "./controls.js";
 import * as Chart from "./charts.js";
 import * as Dashboard from "./dashboard.js";
 import * as View from "./view.js";
+import {startCommunicationHealthMonitor} from "./communication-health.js";
 
 export const responseEventQueue = new EventQueue();
 export var ecu = undefined;
@@ -52,6 +53,7 @@ export async function initialise(serialInterface) {
         View.attachTabEventListeners();
         View.setButtonsOnConnectionState();
         View.setButtonsOnEngineRunning();
+        startCommunicationHealthMonitor(() => ecu.isConnected);
 
         logControl.disable();
     }

@@ -3,6 +3,7 @@ import * as Command from "../rosco/mems-1x/mems-commands.js";
 import * as View from "./view.js";
 import * as Dataframe from "./dataframe.js";
 import * as LocalSerialPort from "./local-serialport.js";
+import {downloadSupportLog, refreshCommunicationHealth} from "./communication-health.js";
 import {ecu, ecuVersion, setECU, isLocal, sendCommand, dataframeLog, logControl} from "./init.js";
 
 export function attachControlEventListeners() {
@@ -12,6 +13,13 @@ export function attachControlEventListeners() {
     document.getElementById("clearFaultsButton").addEventListener('click', clearFaults);
     document.getElementById("resetECUButton").addEventListener('click', reset);
     document.getElementById("downloadLogButton").addEventListener('click', downloadLog);
+    document.getElementById("downloadSupportLogButton").addEventListener('click', () => {
+        downloadSupportLog({
+            ecuVersion,
+            connectionMode: isLocal ? "local" : "browser",
+            connected: ecu.isConnected,
+        });
+    });
     document.getElementById("importLogButton").addEventListener('click', () => document.getElementById("importLogFile").click());
     document.getElementById("importLogFile").addEventListener('change', importLog);
     document.getElementById("replay-toggle-button")?.addEventListener("click", Dataframe.toggleReplay);
@@ -49,8 +57,10 @@ export function connectToSerialPort(port) {
         } else {
             showConnectErrorDialog();
         }
+        refreshCommunicationHealth(ecu.isConnected);
     }).catch((error) => {
         console.error(`index.html: connect ${error}`);
+        refreshCommunicationHealth(ecu.isConnected);
     })
 }
 
@@ -62,8 +72,10 @@ function disconnect() {
     ecu.disconnect().then(() => {
         View.setButtonsOnConnectionState();
         View.setButtonsWhenDataHasBeenLogged();
+        refreshCommunicationHealth(ecu.isConnected);
     }).catch((error) => {
         console.error(`index.html: disconnect ${error}`);
+        refreshCommunicationHealth(ecu.isConnected);
     });
 }
 
@@ -173,7 +185,6 @@ export function resetReceived(ecuResponse) {
             break;
     }
 }
-
 
 
 

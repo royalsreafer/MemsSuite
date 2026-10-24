@@ -1,4 +1,7 @@
+import {communicationDiagnostics} from "./mems-communication-diagnostics.js";
+
 const SERIAL_TIMEOUT = 2000;
+const READ_TIMEOUT = Symbol("serial read timeout");
 
 export class MemsSerialInterface {
     constructor() {
@@ -18,26 +21,28 @@ export class MemsSerialInterface {
     // once connected, open the port for read/write
     //
     async connect() {
-        await this._connectToPort()
-            .then((port) => {
-                this._port = port;
-                console.info(`connect: connected to port`);
-            })
-            .catch(() => {
-                console.error(`connect: error connecting to port`);
-                return error;
-            });
+        communicationDiagnostics.recordConnectionAttempt();
+        this._isConnected = false;
 
-        if (this._port !== undefined) {
-            await this._open()
-                .then((opened) => {
-                    console.info(`connect: opened port ${opened}`);
-                    this._isConnected = true;
-                })
-                .catch(() => {
-                    console.error(`connect: error opening port`);
-                    this._isConnected = false;
-                });
+        try {
+            this._port = await this._connectToPort();
+            if (this._port === undefined) {
+                communicationDiagnostics.recordConnectionFailure("port_not_selected");
+                return false;
+            }
+
+            const opened = await this._open();
+            this._isConnected = opened === true;
+            if (this._isConnected) {
+                console.info("connect: opened port");
+                communicationDiagnostics.recordConnectionEstablished();
+            } else {
+                communicationDiagnostics.recordConnectionFailure("port_open_failed");
+            }
+        } catch (error) {
+            this._isConnected = false;
+            communicationDiagnostics.recordConnectionFailure("connection_error");
+            console.error(`connect: error connecting to port (${error})`);
         }
 
         return this._isConnected;
@@ -53,9 +58,11 @@ export class MemsSerialInterface {
                 .then(() => {
                     console.info(`disconnect: closed port`);
                     this._isConnected = false;
+                    communicationDiagnostics.recordDisconnected();
                 })
                 .catch((error) => {
                     console.warn(`disconnect: error closing port ${error}`);
+                    communicationDiagnostics.recordCommunicationError("disconnect_failed");
                 });
         }
 
@@ -81,15 +88,26 @@ export class MemsSerialInterface {
         if (expectedResponseSize < 1) expectedResponseSize = 1;
 
         if (this._isConnected) {
-            return Promise.any([
-                this._read(expectedResponseSize, command),
-                new Promise(resolve => setTimeout(resolve, SERIAL_TIMEOUT, 'serial read timeout'))
-            ]).then((response) => {
+            let timeoutId;
+            try {
+                const response = await Promise.race([
+                    this._read(expectedResponseSize, command),
+                    new Promise(resolve => {
+                        timeoutId = setTimeout(() => resolve(READ_TIMEOUT), SERIAL_TIMEOUT);
+                    }),
+                ]);
+                if (response === READ_TIMEOUT) {
+                    communicationDiagnostics.recordTimeout();
+                    return "serial read timeout";
+                }
                 return response;
-            }).catch(((err) => {
+            } catch (err) {
+                communicationDiagnostics.recordCommunicationError("serial_read_error");
                 console.error(`receiveFromSerial exception ${err}`);
-                reject(err);
-            }))
+                throw err;
+            } finally {
+                clearTimeout(timeoutId);
+            }
         }
 
         return [];

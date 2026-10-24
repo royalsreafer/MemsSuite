@@ -1,4 +1,5 @@
 import {MemsSerialInterface} from "./mems-serial-interface.js";
+import {communicationDiagnostics} from "./mems-communication-diagnostics.js";
 
 export class MemsLocalSerialInterface extends MemsSerialInterface {
     constructor() {
@@ -73,9 +74,14 @@ export class MemsLocalSerialInterface extends MemsSerialInterface {
 
             return await this._sendRequest('POST', `${this._baseUri}/command`, ecuCommandResponse)
                 .then(response => {
-                    return this._hexToBytes(response.Response);
+                    const bytes = this._hexToBytes(response.Response);
+                    if (bytes.length !== expectedResponseSize) {
+                        communicationDiagnostics.recordIncompleteResponse(expectedResponseSize, bytes.length);
+                    }
+                    return bytes;
                 }).catch(err => {
                     console.warn(`send receive error %s`, err);
+                    communicationDiagnostics.recordCommunicationError("local_command_request_failed");
                     return [];
                 });
         }
@@ -116,13 +122,14 @@ export class MemsLocalSerialInterface extends MemsSerialInterface {
         }
 
         return await fetch(endpoint, init).then(async (response) => {
-            try {
-                return await response.json();
-            } catch (e) {
-                console.error(e);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
             }
+            return await response.json();
         }).catch((err) => {
             console.warn(`error in get available ports (${err})`);
+            communicationDiagnostics.recordCommunicationError("local_request_failed");
+            throw err;
         });
     }
 

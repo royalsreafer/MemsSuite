@@ -1,1 +1,20 @@
+<button id="toggleCommunicationHealthButton" class="footer-collapse-button" type="button" aria-expanded="true" aria-controls="template-footer" aria-label="Collapse communication footer"></button>
+<section id="communication-health" class="communication-health card p-3 mb-3 text-start" aria-labelledby="communication-health-title">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <span id="communication-health-led" class="communication-health-led is-disconnected" role="status" aria-label="Communication disconnected"></span>
+        <strong id="communication-health-title">Communication health</strong>
+        <span id="communication-connection">Disconnected</span>
+        <span id="communication-stream" class="text-muted">No active ECU connection</span>
+        <button id="downloadSupportLogButton" class="btn btn-sm btn-outline-secondary ms-auto" type="button" title="Download communication diagnostics without raw ECU data or ECU ID">Download Support Log</button>
+    </div>
+    <dl id="communication-health-metrics" class="communication-health-metrics mb-0 mt-2">
+        <div><dt>Frames</dt><dd id="communication-frames">0</dd></div>
+        <div><dt>Rate</dt><dd id="communication-rate">—</dd></div>
+        <div><dt>Last frame</dt><dd id="communication-last-frame">Never</dd></div>
+        <div><dt>Timeouts</dt><dd id="communication-timeouts">0</dd></div>
+        <div><dt>Incomplete</dt><dd id="communication-incomplete">0</dd></div>
+        <div><dt>Gaps</dt><dd id="communication-gaps">0</dd></div>
+        <div><dt>Reconnects</dt><dd id="communication-reconnects">0</dd></div>
+    </dl>
+</section>
 <div class="footer-copyright text-center py-3">Version 1.4.5 © 2025 Copyright Andrew Jackson<br></div>

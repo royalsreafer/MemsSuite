@@ -81,6 +81,15 @@ describe('connect to the serial port', () => {
         await serial.connect();
         expect(serial.isConnected).toBe(true);
     });
+
+    it('does not report connected when opening the port fails', async () => {
+        const failedOpen = new MemsBrowserSerialInterface();
+        failedOpen._connectToPort = async () => new SerialPortMock();
+        failedOpen._open = async () => false;
+
+        await expect(failedOpen.connect()).resolves.toBe(false);
+        expect(failedOpen.isConnected).toBe(false);
+    });
 });
 
 describe('send and receive date from the serial API ', () => {

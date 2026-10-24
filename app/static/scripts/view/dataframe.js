@@ -3,6 +3,8 @@ import * as Chart from "./charts.js";
 import * as Dashboard from "./dashboard.js";
 import * as Identifier from "./identifiers.js";
 import {dataframeLog, ecu, analysis, analysisReport} from "./init.js";
+import {communicationDiagnostics} from "../rosco/mems-communication-diagnostics.js";
+import {refreshCommunicationHealth} from "./communication-health.js";
 
 let replayTimer;
 let replayIndex = 0;
@@ -13,6 +15,8 @@ let replayStatuses = [];
 export function dataframeReceived(ecuResponse) {
     console.info(`dataframe received ${JSON.stringify(ecuResponse)}`);
     let df = ecu.generateDataframeFromECUResponse(ecuResponse);
+    communicationDiagnostics.recordDataframeReceived();
+    refreshCommunicationHealth(ecu.isConnected);
 
     // add the dataframe to the log
     dataframeLog.addDataframe(df);

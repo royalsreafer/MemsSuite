@@ -1,6 +1,7 @@
 import * as Command from "./mems-1x/mems-commands.js";
 import {MemsSerialInterface} from "./mems-serial-interface.js";
 import {MEMS_KLineInitComplete, MEMS_KLineInitEcho, MEMS_KLineInitWakeup} from "./mems-1x/mems-commands.js";
+import {communicationDiagnostics} from "./mems-communication-diagnostics.js";
 
 export class MemsBrowserSerialInterface extends MemsSerialInterface {
     constructor() {
@@ -75,13 +76,13 @@ export class MemsBrowserSerialInterface extends MemsSerialInterface {
     // open the port for read / write
     //
     async _open() {
-        await this._port.open({baudRate: 9600, bufferSize: 1,})
-            .then(async () => {
-                return true;
-            }).catch(() => {
-                this._port = undefined;
-                return false;
-            });
+        try {
+            await this._port.open({baudRate: 9600, bufferSize: 1});
+            return true;
+        } catch {
+            this._port = undefined;
+            return false;
+        }
     }
 
     //
@@ -119,6 +120,7 @@ export class MemsBrowserSerialInterface extends MemsSerialInterface {
                     })
                     .catch((error) => {
                         console.error(`error ${error}`);
+                        communicationDiagnostics.recordCommunicationError("serial_write_failed");
                     })
                     .finally(() => {
                         this._writer.releaseLock();
@@ -168,12 +170,17 @@ export class MemsBrowserSerialInterface extends MemsSerialInterface {
                     }
                 } catch (error) {
                     console.error(`_read error ${error}`);
+                    communicationDiagnostics.recordCommunicationError("serial_read_failed");
                 } finally {
                     this._reader.releaseLock();
                     console.debug(`_read rx: ${this._arrayAsHexString(rxData)}`);
                 }
+                if (count < n) {
+                    communicationDiagnostics.recordIncompleteResponse(n, count);
+                }
             } else {
                 console.error(`_read serial not readable`);
+                communicationDiagnostics.recordCommunicationError("serial_not_readable");
             }
         }
 

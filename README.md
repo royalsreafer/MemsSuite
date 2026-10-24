@@ -12,6 +12,8 @@ The project is the successor to the original MemsFCR diagnostic application.
 - Provides a native dashboard with current-value gauges, min/max limits, and expected operating ranges.
 - Shows live charts with elapsed time, fault highlighting, and historical scrolling.
 - Exports ECU data as CSV.
+- Displays live communication health in the footer, including a status LED, frame timing, timeouts, incomplete responses, and gaps.
+- Exports a privacy-conscious support log with connection events and communication metrics; it does not include raw ECU data, ECU ID, or selected serial-port name.
 - Imports a previously exported CSV log for replay and analysis.
 - Provides actuator and adjustment controls where supported by the ECU.
 
@@ -40,6 +42,7 @@ The hosted application is available at [web.memsfcr.co.uk](https://web.memsfcr.c
 7. Use the **Dashboard**, **Charts**, **Analysis**, **Actuators**, and **Adjustments** tabs as required.
 
 Use the **Download Log** button to save a CSV recording. Use **Import Log** to replay a CSV recording without connecting to an ECU.
+Use **Support Log** to download communication diagnostics for troubleshooting. The export contains connection and timing summaries, recent diagnostic events, the selected ECU version and browser user-agent; it excludes raw ECU data, ECU ID, and selected serial-port name.
 
 ## Repository layout
 

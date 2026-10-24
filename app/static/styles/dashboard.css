@@ -4,6 +4,68 @@
     gap: .5rem;
 }
 
+.communication-health[data-stream-state="stale"] {
+    border-color: #ffc107;
+}
+
+.communication-health[data-connection-state="connected"][data-stream-state="current"] {
+    border-color: #198754;
+}
+
+.communication-health-led {
+    display: inline-block;
+    width: .8rem;
+    height: .8rem;
+    border: 1px solid #6c757d;
+    border-radius: 50%;
+    background: #adb5bd;
+    box-shadow: 0 0 0 2px rgba(108, 117, 125, .15);
+}
+
+.communication-health-led.is-current {
+    border-color: #146c2e;
+    background: #198754;
+    box-shadow: 0 0 6px rgba(25, 135, 84, .75);
+}
+
+.communication-health-led.is-waiting {
+    border-color: #997404;
+    background: #ffc107;
+    box-shadow: 0 0 6px rgba(255, 193, 7, .65);
+}
+
+.communication-health-led.is-stale {
+    border-color: #842029;
+    background: #dc3545;
+    box-shadow: 0 0 6px rgba(220, 53, 69, .7);
+}
+
+.communication-health-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1.5rem;
+    row-gap: .25rem;
+}
+
+.communication-health-metrics > div {
+    display: flex;
+    gap: .3rem;
+}
+
+.communication-health-metrics dt {
+    color: #6c757d;
+    font-weight: 400;
+}
+
+.communication-health-metrics dt::after {
+    content: ":";
+}
+
+.communication-health-metrics dd {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+}
+
 .replay-condition-bar {
     display: flex;
     gap: 1px;
