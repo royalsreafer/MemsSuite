@@ -57,6 +57,22 @@ export function resetChartTime() {
     chartViewOffset = 0;
 }
 
+export function resetChartHistory() {
+    charts.forEach((chart) => {
+        if (chart._history !== undefined) {
+            chart._history.labels = [];
+            chart._history.data = [];
+            chart._history.faults = [];
+        }
+
+        chart.data.labels = [];
+        chart.data.datasets.forEach((dataset) => {
+            dataset.data = [];
+        });
+        chart.update("none");
+    });
+}
+
 function scrollCharts(event) {
     const maxOffset = getMaxChartOffset();
 

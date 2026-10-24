@@ -65,6 +65,7 @@ export function importDataframes(csv) {
     analysis.reset();
     analysisReport.updateFaultPill();
     Chart.resetChartTime();
+    Chart.resetChartHistory();
     dataframeLog._dataframes = [];
 
     dataframes.forEach((df, i) => {
