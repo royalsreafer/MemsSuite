@@ -59,6 +59,21 @@ const gaugeDefinitions = [
         decimals: 0,
     },
     {
+        id: "coil-time",
+        metric: "_80x17_CoilTime",
+        faultKeys: ["_80x17_CoilTime"],
+        title: "Coil time",
+        units: "ms",
+        tooltip: "The ECU coil dwell time.\nExpected range: 0-6 ms.\nLonger dwell times can indicate a coil or battery-related problem.",
+        min: 0,
+        max: 10,
+        majorTicks: ["0", "2", "4", "6", "8", "10"],
+        expected: "Expected: 0-6 ms",
+        ranges: [{min: 0, max: 6}],
+        highlights: [{from: 0, to: 6, color: "rgba(26,174,24,.8)"}, {from: 6, to: 8, color: "rgba(248,182,69,.8)"}, {from: 8, to: 10, color: "rgba(225,7,23,.8)"}],
+        decimals: 2,
+    },
+    {
         id: "battery",
         metric: "_80x08_BatteryVoltage",
         title: "Battery voltage",
@@ -125,9 +140,9 @@ const gaugeDefinitions = [
         min: -40,
         max: 40,
         majorTicks: ["-40", "-30", "-20", "-10", "0", "10", "20", "30", "40"],
-        expected: "Near zero: -2 to +2",
-        ranges: [{min: -2, max: 2}],
-        highlights: [{from: -40, to: -20, color: "rgba(225,7,23,.8)"}, {from: -20, to: -10, color: "rgba(248,182,69,.8)"}, {from: -10, to: -2, color: "rgba(150,184,255,.8)"}, {from: -2, to: 2, color: "rgba(26,174,24,.8)"}, {from: 2, to: 10, color: "rgba(135,60,248,.8)"}, {from: 10, to: 20, color: "rgba(248,182,69,.8)"}, {from: 20, to: 40, color: "rgba(225,7,23,.8)"}],
+        expected: "Expected: -10 to +10",
+        ranges: [{min: -10, max: 10}],
+        highlights: [{from: -40, to: -20, color: "rgba(225,7,23,.8)"}, {from: -20, to: -10, color: "rgba(248,182,69,.8)"}, {from: -10, to: 10, color: "rgba(26,174,24,.8)"}, {from: 10, to: 20, color: "rgba(248,182,69,.8)"}, {from: 20, to: 40, color: "rgba(225,7,23,.8)"}],
         decimals: 0,
     },
     {
@@ -139,9 +154,9 @@ const gaugeDefinitions = [
         min: -40,
         max: 40,
         majorTicks: ["-40", "-30", "-20", "-10", "0", "10", "20", "30", "40"],
-        expected: "Near zero: -2 to +2",
-        ranges: [{min: -2, max: 2}],
-        highlights: [{from: -40, to: -20, color: "rgba(225,7,23,.8)"}, {from: -20, to: -10, color: "rgba(248,182,69,.8)"}, {from: -10, to: -2, color: "rgba(150,184,255,.8)"}, {from: -2, to: 2, color: "rgba(26,174,24,.8)"}, {from: 2, to: 10, color: "rgba(135,60,248,.8)"}, {from: 10, to: 20, color: "rgba(248,182,69,.8)"}, {from: 20, to: 40, color: "rgba(225,7,23,.8)"}],
+        expected: "Expected: -10 to +10",
+        ranges: [{min: -10, max: 10}],
+        highlights: [{from: -40, to: -20, color: "rgba(225,7,23,.8)"}, {from: -20, to: -10, color: "rgba(248,182,69,.8)"}, {from: -10, to: 10, color: "rgba(26,174,24,.8)"}, {from: 10, to: 20, color: "rgba(248,182,69,.8)"}, {from: 20, to: 40, color: "rgba(225,7,23,.8)"}],
         decimals: 0,
     },
     {
@@ -329,4 +344,32 @@ export function update(df, faults = {}, status = undefined) {
     if (lambdaLoopLed !== null && status !== undefined) {
         lambdaLoopLed.className = `status-led ${status.isLoopClosed ? "is-on" : "is-off"}`;
     }
+}
+
+export function getGaugeCondition(df, faults = {}) {
+    let condition = "normal";
+
+    gaugeDefinitions.forEach((definition) => {
+        const value = df[definition.metric];
+        if (typeof value !== "number" || !Number.isFinite(value)) {
+            return;
+        }
+
+        const faultKeys = definition.faultKeys || [];
+        const hasFault = faults[definition.metric] === true ||
+            faultKeys.some((key) => faults[key] === true);
+        if (hasFault) {
+            condition = "fault";
+            return;
+        }
+
+        const inExpectedRange = definition.ranges.some((range) =>
+            value >= range.min && value <= range.max
+        );
+        if (condition !== "fault" && !inExpectedRange) {
+            condition = "warning";
+        }
+    });
+
+    return condition;
 }

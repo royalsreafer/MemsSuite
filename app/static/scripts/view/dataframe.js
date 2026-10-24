@@ -4,6 +4,12 @@ import * as Dashboard from "./dashboard.js";
 import * as Identifier from "./identifiers.js";
 import {dataframeLog, ecu, analysis, analysisReport} from "./init.js";
 
+let replayTimer;
+let replayIndex = 0;
+let replaySpeed = 1;
+let replayPlaying = false;
+let replayStatuses = [];
+
 export function dataframeReceived(ecuResponse) {
     console.info(`dataframe received ${JSON.stringify(ecuResponse)}`);
     let df = ecu.generateDataframeFromECUResponse(ecuResponse);
@@ -53,6 +59,9 @@ export function dataframeReceived(ecuResponse) {
 export function importDataframes(csv) {
     const dataframes = dataframeLog.importCSV(csv);
 
+    stopReplay();
+    replayIndex = 0;
+    replayStatuses = [];
     analysis.reset();
     analysisReport.updateFaultPill();
     Chart.resetChartTime();
@@ -62,7 +71,20 @@ export function importDataframes(csv) {
         // analyse progressively so the status log mirrors a live session
         dataframeLog._dataframes.push(df);
         analysis.analyse();
-        Chart.updateCharts(df, analysis.status.at(-1)?.operationalFaults, false);
+        const status = analysis.status.at(-1);
+        replayStatuses.push(status === undefined ? undefined : {
+            isEngineRunning: status.isEngineRunning,
+            isLoopClosed: status.isLoopClosed,
+            operationalFaults: {...status.operationalFaults},
+            condition: Dashboard.getGaugeCondition(df, status.operationalFaults),
+        });
+        if (status === undefined) {
+            replayStatuses[replayStatuses.length - 1] = {
+                operationalFaults: {},
+                condition: Dashboard.getGaugeCondition(df),
+            };
+        }
+        Chart.updateCharts(df, status?.operationalFaults, false);
     });
     dataframeLog._dataframes = dataframes;
     Chart.refreshCharts();
@@ -82,7 +104,148 @@ export function importDataframes(csv) {
         Dashboard.update(last);
     }
 
+    updateReplayControls();
+    if (document.getElementById("nav-analysis-tab")?.classList.contains("active")) {
+        analysisReport.updateReport();
+    }
     return dataframes.length;
+}
+
+export function toggleReplay() {
+    if (replayPlaying) {
+        stopReplay();
+    } else {
+        startReplay();
+    }
+}
+
+export function setReplaySpeed(speed) {
+    if (Number.isFinite(speed) && speed > 0) {
+        replaySpeed = speed;
+    }
+}
+
+export function seekReplay(index) {
+    const dataframes = dataframeLog.dataframes;
+    if (dataframes.length === 0) {
+        return;
+    }
+
+    stopReplay();
+    replayIndex = Math.max(0, Math.min(dataframes.length - 1, Math.floor(index)));
+    renderReplayFrame();
+}
+
+function startReplay() {
+    if (dataframeLog.dataframes.length === 0) {
+        return;
+    }
+
+    if (replayIndex >= dataframeLog.dataframes.length - 1) {
+        replayIndex = 0;
+    }
+
+    replayPlaying = true;
+    updateReplayControls();
+    renderReplayFrame();
+    scheduleReplayFrame();
+}
+
+function stopReplay() {
+    replayPlaying = false;
+    if (replayTimer !== undefined) {
+        clearTimeout(replayTimer);
+        replayTimer = undefined;
+    }
+    updateReplayControls();
+}
+
+function scheduleReplayFrame() {
+    if (!replayPlaying) {
+        return;
+    }
+
+    replayTimer = setTimeout(() => {
+        replayIndex++;
+        if (replayIndex >= dataframeLog.dataframes.length) {
+            replayIndex = dataframeLog.dataframes.length - 1;
+            stopReplay();
+            return;
+        }
+
+        renderReplayFrame();
+        scheduleReplayFrame();
+    }, 250 / replaySpeed);
+}
+
+function renderReplayFrame() {
+    const dataframe = dataframeLog.dataframes[replayIndex];
+    const status = replayStatuses[replayIndex];
+    if (dataframe === undefined) {
+        return;
+    }
+
+    updateDataframeMetrics(dataframe);
+    if (status !== undefined) {
+        updateState(dataframe, status);
+        colouriseFaults(status.operationalFaults);
+        Dashboard.update(dataframe, status.operationalFaults, status);
+    } else {
+        Dashboard.update(dataframe);
+    }
+    updateReplayPosition(dataframe, status);
+    updateReplayControls();
+}
+
+function updateReplayControls() {
+    const toggle = document.getElementById("replay-toggle-button");
+    const progress = document.getElementById("replay-progress");
+    const position = document.getElementById("replay-position");
+    const conditionBar = document.getElementById("replay-condition-bar");
+    const summary = document.getElementById("replay-condition-summary");
+    const frameCount = dataframeLog.dataframes.length;
+
+    if (progress !== null) {
+        progress.max = Math.max(0, frameCount - 1);
+        progress.value = replayIndex;
+    }
+    if (toggle !== null) {
+        toggle.textContent = replayPlaying ? "Pause" : "Play";
+    }
+    if (position !== null && frameCount > 0) {
+        const status = replayStatuses[replayIndex];
+        const condition = status?.condition || "normal";
+        position.textContent = `Frame ${replayIndex + 1} of ${frameCount} · ${condition}`;
+    }
+    if (summary !== null && frameCount > 0) {
+        const counts = replayStatuses.reduce((result, status) => {
+            const condition = status?.condition || "normal";
+            result[condition]++;
+            return result;
+        }, {normal: 0, warning: 0, fault: 0});
+        summary.textContent = `Normal: ${counts.normal} · Warnings: ${counts.warning} · Faults: ${counts.fault}`;
+    }
+    if (conditionBar !== null) {
+        conditionBar.replaceChildren();
+        replayStatuses.forEach((status, index) => {
+            const marker = document.createElement("button");
+            marker.type = "button";
+            marker.className = `replay-condition-marker ${status?.condition || "normal"}`;
+            marker.title = `Frame ${index + 1}: ${status?.condition || "normal"}`;
+            marker.addEventListener("click", () => seekReplay(index));
+            conditionBar.appendChild(marker);
+        });
+    }
+}
+
+function updateReplayPosition(dataframe, status) {
+    const position = document.getElementById("replay-position");
+    if (position === null) {
+        return;
+    }
+
+    const condition = status?.condition || Dashboard.getGaugeCondition(dataframe);
+    position.textContent = `Frame ${replayIndex + 1} of ${dataframeLog.dataframes.length} · ${condition}`;
 }
 
 function colouriseFaults(faults) {

@@ -19,11 +19,14 @@ export class AnalysisReport {
     }
 
     updateFaultPill() {
+        let elements = document.querySelectorAll(`.fault-count`);
+        this._updateElementsInnerHTML(elements, 0);
+        this._hideElement("fault-count");
+
         if (this.analysis.hasData) {
             if (this.analysis.faults.length > 0) {
                 const alerts = this.analysis.faults.filter(fault => fault.level !== Faults.StatusInfo);
                 if (alerts.length > 0) {
-                    let elements = document.querySelectorAll(`.fault-count`);
                     this._updateElementsInnerHTML(elements, alerts.length);
                     this._displayElement("fault-count");
                 }

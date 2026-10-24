@@ -3,6 +3,25 @@
     <span>Gauges show the current ECU reading. Coloured bands indicate expected or warning ranges for the condition shown; detailed fault rules remain available on the Analysis tab.</span>
 </div>
 
+<div class="dashboard-replay card p-3 mb-3">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <strong>Log replay</strong>
+        <button id="replay-toggle-button" class="btn btn-primary has-logged-data replay-control" disabled>Play</button>
+        <label for="replay-speed" class="mb-0">Speed</label>
+        <select id="replay-speed" class="form-select w-auto has-logged-data replay-control" disabled>
+            <option value="0.5">0.5x</option>
+            <option value="1" selected>1x</option>
+            <option value="2">2x</option>
+            <option value="5">5x</option>
+        </select>
+    </div>
+    <label for="replay-progress" class="visually-hidden">Replay progress</label>
+    <input id="replay-progress" class="form-range mt-2 has-logged-data replay-control" type="range" min="0" max="0" value="0" disabled>
+    <div id="replay-condition-bar" class="replay-condition-bar" aria-label="Replay conditions"></div>
+    <small id="replay-condition-summary" class="text-muted"></small>
+    <small id="replay-position" class="text-muted">Import a log to replay dashboard data.</small>
+</div>
+
 <div class="dashboard-gauges">
     <div class="dashboard-gauge">
         <div class="gauge-title">Engine speed <span class="gauge-units">RPM</span></div>
@@ -12,6 +31,7 @@
             <span><span id="dashboard-crankshaft-fault" class="status-led is-off"></span>Crankshaft fault</span>
         </div>
         <div class="gauge-status is-unknown">Waiting for data</div>
+        <div class="dashboard-spark-container"><canvas title="Engine speed history" class="ecuspark _80x01_EngineRPM"></canvas></div>
     </div>
     <div class="dashboard-gauge">
         <div class="gauge-title">Manifold pressure <span class="gauge-units">kPa</span></div>
@@ -20,36 +40,42 @@
             <span><span id="dashboard-map-fault" class="status-led is-off"></span>MAP fault</span>
         </div>
         <div class="gauge-status is-unknown">Waiting for data</div>
+        <div class="dashboard-spark-container"><canvas title="Manifold pressure history" class="ecuspark _80x07_ManifoldAbsolutePressure"></canvas></div>
     </div>
     <div class="dashboard-gauge">
         <div class="gauge-title">Throttle position <span class="gauge-units">%</span></div>
         <canvas id="gauge-throttle" data-gauge-id="throttle" class="radial-gauge" aria-label="Throttle position gauge"></canvas>
         <div class="gauge-indicators" aria-hidden="true"></div>
         <div class="gauge-status is-unknown">Waiting for data</div>
+        <div class="dashboard-spark-container"><canvas title="Throttle position history" class="ecuspark _80x09_ThrottlePotSensor"></canvas></div>
     </div>
     <div class="dashboard-gauge">
         <div class="gauge-title">IAC position <span class="gauge-units">steps</span></div>
         <canvas id="gauge-iac" data-gauge-id="iac" class="radial-gauge" aria-label="IAC position gauge"></canvas>
         <div class="gauge-indicators" aria-hidden="true"></div>
         <div class="gauge-status is-unknown">Waiting for data</div>
+        <div class="dashboard-spark-container"><canvas title="IAC position history" class="ecuspark _80x12_IACPosition"></canvas></div>
     </div>
     <div class="dashboard-gauge">
         <div class="gauge-title">Battery voltage <span class="gauge-units">V</span></div>
         <canvas id="gauge-battery" data-gauge-id="battery" class="radial-gauge" aria-label="Battery voltage gauge"></canvas>
         <div class="gauge-indicators" aria-hidden="true"></div>
         <div class="gauge-status is-unknown">Waiting for data</div>
+        <div class="dashboard-spark-container"><canvas title="Battery voltage history" class="ecuspark _80x08_BatteryVoltage"></canvas></div>
     </div>
     <div class="dashboard-gauge">
         <div class="gauge-title">Coolant temperature <span class="gauge-units">°C</span></div>
         <canvas id="gauge-coolant" data-gauge-id="coolant" class="radial-gauge" aria-label="Coolant temperature gauge"></canvas>
         <div class="gauge-indicators" aria-hidden="true"></div>
         <div class="gauge-status is-unknown">Waiting for data</div>
+        <div class="dashboard-spark-container"><canvas title="Coolant temperature history" class="ecuspark _80x03_CoolantTemp"></canvas></div>
     </div>
     <div class="dashboard-gauge">
         <div class="gauge-title">Intake-air temperature <span class="gauge-units">°C</span></div>
         <canvas id="gauge-intake-air" data-gauge-id="intake-air" class="radial-gauge" aria-label="Intake-air temperature gauge"></canvas>
         <div class="gauge-indicators" aria-hidden="true"></div>
         <div class="gauge-status is-unknown">Waiting for data</div>
+        <div class="dashboard-spark-container"><canvas title="Intake-air temperature history" class="ecuspark _80x05_IntakeAirTemp"></canvas></div>
     </div>
     <div class="dashboard-gauge">
         <div class="gauge-title">Lambda voltage <span class="gauge-units">mV</span></div>
@@ -58,29 +84,41 @@
             <span><span id="dashboard-lambda-loop" class="status-led is-off"></span>Closed loop</span>
         </div>
         <div class="gauge-status is-unknown">Waiting for data</div>
+        <div class="dashboard-spark-container"><canvas title="Lambda voltage history" class="ecuspark _7Dx06_LambdaVoltage"></canvas></div>
     </div>
     <div class="dashboard-gauge">
         <div class="gauge-title">Short-term fuel trim <span class="gauge-units">%</span></div>
         <canvas id="gauge-short-term-fuel-trim" data-gauge-id="short-term-fuel-trim" class="radial-gauge" aria-label="Short-term fuel trim gauge"></canvas>
         <div class="gauge-indicators" aria-hidden="true"></div>
         <div class="gauge-status is-unknown">Waiting for data</div>
+        <div class="dashboard-spark-container"><canvas title="Short-term fuel trim history" class="ecuspark _7Dx0C_ShortTermFuelTrim"></canvas></div>
     </div>
     <div class="dashboard-gauge">
         <div class="gauge-title">Long-term fuel trim <span class="gauge-units">%</span></div>
         <canvas id="gauge-long-term-fuel-trim" data-gauge-id="long-term-fuel-trim" class="radial-gauge" aria-label="Long-term fuel trim gauge"></canvas>
         <div class="gauge-indicators" aria-hidden="true"></div>
         <div class="gauge-status is-unknown">Waiting for data</div>
+        <div class="dashboard-spark-container"><canvas title="Long-term fuel trim history" class="ecuspark _7Dx0B_LongTermFuelTrim"></canvas></div>
     </div>
     <div class="dashboard-gauge">
         <div class="gauge-title">Air-fuel ratio</div>
         <canvas id="gauge-air-fuel-ratio" data-gauge-id="air-fuel-ratio" class="radial-gauge" aria-label="Air-fuel ratio gauge"></canvas>
         <div class="gauge-indicators" aria-hidden="true"></div>
         <div class="gauge-status is-unknown">Waiting for data</div>
+        <div class="dashboard-spark-container"><canvas title="Air-fuel ratio history" class="ecuspark _7Dx04_AirFuelRatio"></canvas></div>
+    </div>
+    <div class="dashboard-gauge">
+        <div class="gauge-title">Coil time <span class="gauge-units">ms</span></div>
+        <canvas id="gauge-coil-time" data-gauge-id="coil-time" class="radial-gauge" aria-label="Coil time gauge"></canvas>
+        <div class="gauge-indicators" aria-hidden="true"></div>
+        <div class="gauge-status is-unknown">Waiting for data</div>
+        <div class="dashboard-spark-container"><canvas title="Coil time history" class="ecuspark _80x17_CoilTime"></canvas></div>
     </div>
     <div class="dashboard-gauge">
         <div class="gauge-title">Ignition advance <span class="gauge-units">°</span></div>
         <canvas id="gauge-ignition-advance" data-gauge-id="ignition-advance" class="radial-gauge" aria-label="Ignition advance gauge"></canvas>
         <div class="gauge-indicators" aria-hidden="true"></div>
         <div class="gauge-status is-unknown">Waiting for data</div>
+        <div class="dashboard-spark-container"><canvas title="Ignition advance history" class="ecuspark _80x16_IgnitionAdvance"></canvas></div>
     </div>
 </div>

@@ -14,6 +14,13 @@ export function attachControlEventListeners() {
     document.getElementById("downloadLogButton").addEventListener('click', downloadLog);
     document.getElementById("importLogButton").addEventListener('click', () => document.getElementById("importLogFile").click());
     document.getElementById("importLogFile").addEventListener('change', importLog);
+    document.getElementById("replay-toggle-button")?.addEventListener("click", Dataframe.toggleReplay);
+    document.getElementById("replay-speed")?.addEventListener("change", (event) => {
+        Dataframe.setReplaySpeed(Number(event.target.value));
+    });
+    document.getElementById("replay-progress")?.addEventListener("input", (event) => {
+        Dataframe.seekReplay(Number(event.target.value));
+    });
     document.getElementById("versionButton").addEventListener('change', selectEcuVersion, false);
     document.getElementById("consoleDebug").addEventListener('change', consoleDebug, false);
 
@@ -166,7 +173,6 @@ export function resetReceived(ecuResponse) {
             break;
     }
 }
-
 
 
 
