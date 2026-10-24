@@ -1,5 +1,9 @@
-import { Thermostat, THERMOSTAT_FAULTY, THERMOSTAT_WORKING } from '../thermostat.js';
-import * as Constant from '../analysis-constants.js';
+import {
+    Thermostat,
+    THERMOSTAT_FAULTY,
+    THERMOSTAT_OPEN_TEMPERATURE,
+    THERMOSTAT_WORKING
+} from '../thermostat.js';
 
 describe('Thermostat', () => {
     let thermostat;
@@ -40,7 +44,11 @@ describe('Thermostat', () => {
             const warmDataframes = [
                 {
                     _80x00_Time: '2024-01-01T00:00:00Z',
-                    _80x03_CoolantTemp: Constant.THERMOSTAT_OPEN_TEMPERATURE + 5
+                    _80x03_CoolantTemp: THERMOSTAT_OPEN_TEMPERATURE + 1
+                },
+                {
+                    _80x00_Time: '2024-01-01T00:00:10Z',
+                    _80x03_CoolantTemp: THERMOSTAT_OPEN_TEMPERATURE - 1
                 }
             ];
             thermostat.update(warmDataframes);
@@ -51,11 +59,11 @@ describe('Thermostat', () => {
             const dataframes = [
                 {
                     _80x00_Time: '2024-01-01T00:00:00Z',
-                    _80x03_CoolantTemp: Constant.THERMOSTAT_OPEN_TEMPERATURE + 10
+                    _80x03_CoolantTemp: THERMOSTAT_OPEN_TEMPERATURE + 10
                 },
                 {
                     _80x00_Time: '2024-01-01T00:00:10Z',
-                    _80x03_CoolantTemp: Constant.THERMOSTAT_OPEN_TEMPERATURE + 5
+                    _80x03_CoolantTemp: THERMOSTAT_OPEN_TEMPERATURE + 5
                 }
             ];
             thermostat.update(dataframes);
@@ -66,11 +74,11 @@ describe('Thermostat', () => {
             const dataframes = [
                 {
                     _80x00_Time: '2024-01-01T00:00:00Z',
-                    _80x03_CoolantTemp: Constant.THERMOSTAT_OPEN_TEMPERATURE + 10
+                    _80x03_CoolantTemp: THERMOSTAT_OPEN_TEMPERATURE + 10
                 },
                 {
                     _80x00_Time: '2024-01-01T00:00:10Z',
-                    _80x03_CoolantTemp: Constant.THERMOSTAT_OPEN_TEMPERATURE + 10
+                    _80x03_CoolantTemp: THERMOSTAT_OPEN_TEMPERATURE + 10
                 }
             ];
             thermostat.update(dataframes);
@@ -90,11 +98,11 @@ describe('Thermostat', () => {
             const dataframes = [
                 {
                     _80x00_Time: '2024-01-01T00:00:00Z',
-                    _80x03_CoolantTemp: Constant.THERMOSTAT_OPEN_TEMPERATURE + 10
+                    _80x03_CoolantTemp: THERMOSTAT_OPEN_TEMPERATURE + 10
                 },
                 {
                     _80x00_Time: '2024-01-01T00:00:10Z',
-                    _80x03_CoolantTemp: Constant.THERMOSTAT_OPEN_TEMPERATURE + 5
+                    _80x03_CoolantTemp: THERMOSTAT_OPEN_TEMPERATURE + 5
                 }
             ];
             thermostat.update(dataframes);
@@ -105,11 +113,11 @@ describe('Thermostat', () => {
             const dataframes = [
                 {
                     _80x00_Time: '2024-01-01T00:00:00Z',
-                    _80x03_CoolantTemp: Constant.THERMOSTAT_OPEN_TEMPERATURE + 10
+                    _80x03_CoolantTemp: THERMOSTAT_OPEN_TEMPERATURE + 10
                 },
                 {
                     _80x00_Time: '2024-01-01T00:00:10Z',
-                    _80x03_CoolantTemp: Constant.THERMOSTAT_OPEN_TEMPERATURE + 15
+                    _80x03_CoolantTemp: THERMOSTAT_OPEN_TEMPERATURE + 15
                 }
             ];
             thermostat.update(dataframes);

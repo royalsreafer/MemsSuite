@@ -48,11 +48,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: lts/*
           cache: npm
 
       - name: Install test dependencies
-        run: npm install --ignore-scripts --force
+        run: npm ci --ignore-scripts --force
 
       - name: Check JavaScript syntax
         shell: bash
@@ -62,4 +62,3 @@ jobs:
 
       - name: Run Jest
         run: npm test -- --runInBand
-
