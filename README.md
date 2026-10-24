@@ -141,6 +141,16 @@ npm test
 
 The tests cover dataframe parsing and the client-side analysis modules. The `appdmg` dependency is macOS-only; Windows development environments may need to install the JavaScript test dependencies using a platform-aware npm setup or run the full dependency install on macOS/CI.
 
+## GitHub Actions
+
+GitHub Actions runs automatically for:
+
+- Pull requests targeting `main`.
+- Pushes to `main`.
+- Release tags matching `v*.*.*`, such as `v1.0.0`.
+
+Pull requests and `main` pushes run Go formatting, tests, vet, builds, JavaScript syntax checks, and Jest. A version tag builds a Windows package containing `webmemsfcr.exe` and its required `resources` directory, then publishes the ZIP file to a GitHub Release. The release workflow uses GitHub-hosted runners and does not require external deployment credentials.
+
 ## Importing and testing a log
 
 An exported CSV can be imported from the application using **Import Log**. The import replays the data through the analysis and charts without requiring an ECU connection.

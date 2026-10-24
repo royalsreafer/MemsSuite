@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build Windows release
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: app/go.mod
+          cache: true
+
+      - name: Build executable
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist\windows\resources\static | Out-Null
+          Push-Location app
+          go build -ldflags "-H windowsgui -s -w" -o ..\dist\windows\webmemsfcr.exe
+          Pop-Location
+
+      - name: Package web resources
+        shell: pwsh
+        run: |
+          Copy-Item app\index.html, app\error.html dist\windows\resources
+          Copy-Item -Recurse -Force app\static\* dist\windows\resources\static
+          Compress-Archive -Path dist\windows\webmemsfcr.exe, dist\windows\resources -DestinationPath dist\webmemsfcr-windows-${{ github.ref_name }}.zip
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          gh release create "${{ github.ref_name }}" `
+            "dist\webmemsfcr-windows-${{ github.ref_name }}.zip" `
+            --title "${{ github.ref_name }}" `
+            --generate-notes
