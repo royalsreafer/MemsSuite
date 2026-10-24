@@ -85,7 +85,7 @@ export class DataframeLog {
         const header = lines[0].replace(/^\uFEFF/, '').split(',').map(column => column.trim());
 
         if (header.length !== CSV_HEADER.length || !CSV_HEADER.every((column, i) => column === header[i])) {
-            throw new Error('the file is not a Web MemsFCR log, the column headings do not match');
+            throw new Error('the file is not a MemsSuite log, the column headings do not match');
         }
 
         return lines.slice(1).map((line, row) => {
@@ -206,7 +206,7 @@ export class DataframeLog {
         filename = filename.replaceAll(':', '');
 
         if (ecuId === undefined) {
-            filename += "-memsfcr.csv";
+            filename += "-memssuite.csv";
         } else {
             filename += `-${ecuId}.csv`;
         }

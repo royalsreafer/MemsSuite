@@ -3,13 +3,13 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="MemsFCR Online Analysis">
+	<meta name="description" content="MemsSuite Rover MEMS diagnostics">
 	<meta name="author" content="Andrew Jackson">
 	<meta name="google" content="notranslate"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 
-	<title>Web MemsFCR</title>
+	<title>MemsSuite</title>
 	<link rel="shortcut icon" href="/static/favicon.ico" />
 
 <!-- includes.html -->
@@ -47,53 +47,25 @@
 	<link href="/static/styles/dashboard.css" rel="stylesheet">
     <!-- includes.html -->
 
-    <script type="text/javascript" charset="utf-8">
-        // the websocket is only used by the local server to determine
-        // whether the website is still active. when the site is closed
-        // the websocket gets closed and triggers the server to shutdown
-
-        if (document.location.host !== "web.memsfcr.co.uk") {
-            let wsUrl = "ws://" + document.location.host + "/ws";
-            console.info(`establishing websocket connection to local server ${wsUrl}`);
-
-            let conn = new WebSocket(wsUrl);
-
-            window.isLocalServer = true;
-
-            conn.onclose = function (evt) {
-                window.isLocalServer = false;
-                console.warn(`ws closed`);
-            };
-            conn.onmessage = function (evt) {
-                console.info(evt);
-            };
-        }
-    </script>
-
     <script src="/static/scripts/thirdparty/gauge.min.js"></script>
     <script type="module">
 		//
 		// initialise the ecu and event queue
 		//
 
-		//import {local_initialise} from "/static/scripts/view/local-init.js";
         import {initialise, loadTemplates, setRunningLocal} from "./static/scripts/view/init.js";
-        import {MemsLocalSerialInterface} from "./static/scripts/rosco/mems-local-serial.js";
         import {MemsBrowserSerialInterface} from "./static/scripts/rosco/mems-browser-serial.js";
-
-		//local_initialise();
+        import {MemsTauriSerialInterface} from "./static/scripts/rosco/mems-tauri-serial.js";
 
         // load the templates before initialising event handlers
         await loadTemplates();
 
-        if (window.isLocalServer) {
-            console.info("running local server");
+        if (window.__TAURI__) {
+            console.info("running in Tauri desktop mode");
             setRunningLocal();
-            // initialise with a local serial interface
-            await initialise(new MemsLocalSerialInterface());
+            await initialise(new MemsTauriSerialInterface());
         } else {
-            console.info("running remote server, browser based serial comms");
-            // initialise with the browser serial interface
+            console.info("running browser mode, browser based serial comms");
             await initialise(new MemsBrowserSerialInterface());
         }
 	</script>

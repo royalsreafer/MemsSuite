@@ -134,7 +134,7 @@ function importLog(event) {
 
 function showConnectErrorDialog() {
     document.getElementById(Identifier.messageModalTitleId).textContent = "Unable to Connect to ECU"
-    document.getElementById(Identifier.messageModalTextId).innerHTML = "<p>Web MemsFCR was unable to connect to the ECU</p><ol><li>Check Diagnostic Cable is connected correctly and ignition is On.</li><li>Check that you have selected the  correct Serial Port.</li><li>If the connection fails again, reload this page</li></ol>"
+    document.getElementById(Identifier.messageModalTextId).innerHTML = "<p>MemsSuite was unable to connect to the ECU</p><ol><li>Check Diagnostic Cable is connected correctly and ignition is On.</li><li>Check that you have selected the  correct Serial Port.</li><li>If the connection fails again, reload this page</li></ol>"
 
     let modalDialog = document.getElementById(Identifier.messageModalId);
     modalDialog.addEventListener('hidden.bs.modal', () => {
@@ -185,6 +185,5 @@ export function resetReceived(ecuResponse) {
             break;
     }
 }
-
 
 

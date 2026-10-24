@@ -2,6 +2,7 @@ import {communicationDiagnostics, STALE_FRAME_THRESHOLD_MS} from "../rosco/mems-
 
 let monitor;
 let footerResizeObserver;
+let footerManuallyToggled = false;
 
 export function downloadSupportLog(context) {
     communicationDiagnostics.recordEvent("support_log_exported");
@@ -20,7 +21,7 @@ export function downloadSupportLog(context) {
     const timestamp = report.generatedAt.replace(/[:.]/g, "-");
 
     link.href = url;
-    link.download = `webmemsfcr-support-${timestamp}.json`;
+    link.download = `memssuite-support-${timestamp}.json`;
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -32,8 +33,8 @@ export function startCommunicationHealthMonitor(getConnected) {
         clearInterval(monitor);
     }
 
-    reserveFooterSpace();
     attachCollapseControl();
+    reserveFooterSpace();
     refreshCommunicationHealth(getConnected());
     monitor = setInterval(() => refreshCommunicationHealth(getConnected()), 1000);
 }
@@ -46,7 +47,22 @@ function attachCollapseControl() {
     }
 
     button.dataset.bound = "true";
+    if (window.innerHeight < 900) {
+        // Keep the fixed footer from covering the dashboard in shorter windows.
+        footer.classList.add("is-collapsed");
+        button.setAttribute("aria-expanded", "false");
+        button.setAttribute("aria-label", "Expand communication footer");
+    }
+    window.addEventListener("resize", () => {
+        if (!footerManuallyToggled && window.innerHeight < 900 && !footer.classList.contains("is-collapsed")) {
+            footer.classList.add("is-collapsed");
+            button.setAttribute("aria-expanded", "false");
+            button.setAttribute("aria-label", "Expand communication footer");
+            reserveFooterSpace();
+        }
+    });
     button.addEventListener("click", () => {
+        footerManuallyToggled = true;
         const collapsed = footer.classList.toggle("is-collapsed");
         button.setAttribute("aria-expanded", `${!collapsed}`);
         button.setAttribute("aria-label", `${collapsed ? "Expand" : "Collapse"} communication footer`);
@@ -122,23 +138,24 @@ function getStreamStatus(connected, snapshot) {
     return "ECU data is arriving";
 }
 
+function getLedLabel(streamState) {
+    switch (streamState) {
+        case "current":
+            return "healthy";
+        case "waiting":
+            return "waiting for data";
+        case "stale":
+            return "stale";
+        default:
+            return "disconnected";
+    }
+}
+
 function getStreamState(connected, snapshot) {
     if (!connected) {
         return "disconnected";
     }
 
-    function getLedLabel(streamState) {
-        switch (streamState) {
-            case "current":
-                return "healthy";
-            case "waiting":
-                return "waiting for data";
-            case "stale":
-                return "stale";
-            default:
-                return "disconnected";
-        }
-    }
     if (snapshot.lastFrameAgeMs === undefined) {
         return "waiting";
     }

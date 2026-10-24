@@ -1,0 +1,21 @@
+[package]
+name = "memssuite"
+version = "1.0.0"
+description = "Rover MEMS ECU diagnostics"
+authors = ["Andrew Jackson"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serialport = { version = "4.7", default-features = false }
+tauri = { version = "2", features = [] }
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

@@ -10,33 +10,28 @@ permissions:
   contents: read
 
 jobs:
-  go:
-    name: Go tests and build
+  rust:
+    name: Rust checks
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: app
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Install Tauri Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev librsvg2-dev libayatana-appindicator3-dev
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
         with:
-          go-version-file: app/go.mod
-          cache: true
+          components: rustfmt
 
       - name: Check formatting
-        run: test -z "$(gofmt -l .)"
+        run: cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
 
-      - name: Run tests
-        run: go test ./...
-
-      - name: Run vet
-        run: go vet ./...
-
-      - name: Build
-        run: go build ./...
+      - name: Run Rust tests
+        run: cargo test --manifest-path src-tauri/Cargo.toml
 
   javascript:
     name: JavaScript tests and syntax

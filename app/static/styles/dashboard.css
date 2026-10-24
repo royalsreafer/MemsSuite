@@ -133,8 +133,22 @@
 
 .dashboard-gauges {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
     gap: 1.5rem;
+}
+
+.dashboard-replay.is-empty {
+    padding-block: .75rem !important;
+}
+
+.dashboard-replay.is-empty #replay-progress,
+.dashboard-replay.is-empty #replay-condition-bar,
+.dashboard-replay.is-empty #replay-condition-summary {
+    display: none;
+}
+
+.dashboard-replay.is-empty #replay-position {
+    margin-left: auto;
 }
 
 .dashboard-gauge {
@@ -358,4 +372,32 @@
 .dashboard-spark-container .ecuspark {
     width: 100%;
     height: 100%;
+}
+
+@media (max-height: 700px) {
+    .dashboard-gauge {
+        padding: .5rem .5rem .4rem;
+    }
+
+    .gauge-title {
+        min-height: 2rem;
+    }
+
+    .gauge-indicators {
+        min-height: 1.5rem;
+        gap: .4rem;
+        margin-top: .25rem;
+        font-size: .75rem;
+    }
+
+    .gauge-status {
+        min-height: 1.6rem;
+        margin-top: .35rem;
+        padding: .2rem .4rem;
+        font-size: .8rem;
+    }
+
+    .dashboard-spark-container {
+        display: none;
+    }
 }

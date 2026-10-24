@@ -52,8 +52,24 @@ body {
     overflow: hidden;
 }
 
-.page-footer.is-collapsed > :not(.footer-collapse-button) {
+.page-footer.is-collapsed > .footer-copyright,
+.page-footer.is-collapsed #communication-health-metrics,
+.page-footer.is-collapsed #downloadSupportLogButton {
     display: none;
+}
+
+.page-footer.is-collapsed > .communication-health {
+    margin: 0 !important;
+    padding: .25rem 3.5rem .25rem 0 !important;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.page-footer.is-collapsed .communication-health-header {
+    flex-wrap: nowrap !important;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .page-footer.is-collapsed .footer-collapse-button::before {

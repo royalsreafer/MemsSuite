@@ -1,6 +1,6 @@
-# WebMemsFCR
+# MemsSuite
 
-WebMemsFCR is a browser-based diagnostic tool for Rover MEMS engine control units. It connects to MEMS 1.3, 1.6, and 1.9 ECUs through a compatible SPI diagnostic cable and displays live ECU data, actuator controls, adjustments, charts, and diagnostic analysis.
+MemsSuite (formerly WebMemsFCR) is a diagnostic tool for Rover MEMS engine control units. It connects to MEMS 1.3, 1.6, and 1.9 ECUs through a compatible SPI diagnostic cable and displays live ECU data, actuator controls, adjustments, charts, and diagnostic analysis.
 
 The project is the successor to the original MemsFCR diagnostic application.
 
@@ -21,12 +21,12 @@ Analysis results are indications based on recorded ECU values and thresholds. Th
 
 ## Differences from the original MemsFCR application
 
-WebMemsFCR keeps the familiar diagnostic concepts from the original application but provides a browser-based interface and a different workflow:
+MemsSuite keeps the familiar diagnostic concepts from the original application but provides a browser-based interface and a different workflow:
 
 - **Dashboard gauges:** The Dashboard uses radial gauges for RPM, MAP, throttle position, IAC position, battery voltage, coolant and intake-air temperature, lambda voltage, fuel trims, air-fuel ratio, and ignition advance. Gauge scales, coloured operating bands, status LEDs, and hover guidance make the current reading easier to interpret.
 - **CSV replay:** Use **Download Log** to save ECU data and **Import Log** to replay a CSV without connecting to an ECU. Replay runs through the same analysis, fault reporting, dashboard gauges, and charts used for live data.
 - **Charts and history:** Charts use elapsed time starting at zero, retain the imported history, show fault overlays and condition explanations, and support scrolling through older time windows.
-- **Browser and local operation:** The same web interface can use browser serial communication for the hosted application or the Go local server for the desktop executable.
+- **Browser and local operation:** The hosted application uses browser serial communication; the Tauri desktop application uses native Rust serial transport.
 - **Client-side diagnostics:** Fault conditions are derived in the browser from the decoded ECU data. The CSV contains measurements; fault IDs and explanations are produced during live processing or replay.
 
 ## Using the online application
@@ -37,7 +37,7 @@ The hosted application is available at [web.memsfcr.co.uk](https://web.memsfcr.c
 2. Connect the diagnostic cable to the vehicle diagnostic port.
 3. Turn the ignition on. The engine does not need to be running to connect.
 4. Connect the cable to the computer.
-5. Open WebMemsFCR and click **Connect**.
+5. Open MemsSuite and click **Connect**.
 6. Select the serial/COM port used by the cable.
 7. Use the **Dashboard**, **Charts**, **Analysis**, **Actuators**, and **Adjustments** tabs as required.
 
@@ -47,91 +47,47 @@ Use **Support Log** to download communication diagnostics for troubleshooting. T
 ## Repository layout
 
 ```text
+src-tauri/                 Rust serial transport and Tauri desktop application
 app/
-  fcr/                    Go serial and web-server implementation
   static/                 HTML templates, JavaScript, CSS, and images
-  webmemsfcr.go           Go application entry point
-  go.mod                  Go dependencies
 app/static/scripts/
   analysis/               Client-side analysis and fault rules
   rosco/                  ECU protocol and dataframe handling
   view/                   Dashboard, chart, import, and report UI
-Make.bat                  Windows build and run script
-Makefile                  macOS packaging and build targets
+Make.bat                  Windows Tauri build and launch script
+Makefile                  macOS Tauri build targets
 package.json              JavaScript test dependencies
 ```
 
-The primary application is Go. The repository no longer includes the older Flask/Python implementation.
+The desktop application is built with Rust and Tauri. Its native serial connection and MEMS protocol transport are in `src-tauri/`; the established HTML/JavaScript frontend remains the WebView UI and continues to implement dataframe decoding, diagnostics, charts, and CSV replay.
 
 ## Development prerequisites
 
-- Go 1.19 or newer.
+- Rust stable with the platform prerequisites listed in the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/).
+- Tauri CLI 2 (`cargo install tauri-cli --version "^2" --locked`).
 - Node.js and npm for JavaScript tests.
 - A compatible serial cable and ECU for hardware testing.
-- Windows users need a Go installation available on `PATH`.
 - macOS packaging requires the macOS build tools and signing tools when creating signed releases.
 
-## Build on Windows
+## Run and build the Tauri application
 
-From the repository root, run:
+From the repository root, start the desktop app in development mode:
 
-```bat
-Make.bat
+```bash
+cargo tauri dev
 ```
 
-This builds `app` and creates:
+Build the native application and platform bundles with:
 
-```text
-dist\windows\webmemsfcr.exe
+```bash
+cargo tauri build
 ```
 
-The script also copies the static web resources beside the executable and starts the application. The executable expects its `resources` directory to be beside it, so do not move the `.exe` without that directory.
-
-To build without starting the application:
-
-```powershell
-New-Item -ItemType Directory -Force dist\windows | Out-Null
-Set-Location app
-go build -o ..\dist\windows\webmemsfcr.exe
-```
-
-For a manually built Windows executable, copy the runtime resources:
-
-```powershell
-New-Item -ItemType Directory -Force ..\dist\windows\resources\static | Out-Null
-Copy-Item index.html, error.html ..\dist\windows\resources
-Copy-Item -Recurse -Force static\* ..\dist\windows\resources\static
-```
-
-## Build on macOS
-
-The Makefile contains macOS application and packaging targets:
+On Windows, `Make.bat` runs the Tauri production build and opens the resulting executable. macOS developers can use the convenience targets in `Makefile`:
 
 ```bash
 make build
 ```
-
-Architecture-specific builds are also available:
-
-```bash
-make build-arm    # Apple Silicon
-make build-amd    # Intel
-make build-package
-```
-
-The `all` target additionally signs and notarizes the application and requires the appropriate Apple Developer credentials and local signing configuration.
-
-## Run the Go application
-
-The packaged executable opens the browser automatically and selects an available local port.
-
-For a headless server:
-
-```text
-webmemsfcr.exe -headless
-```
-
-The server listens on a local loopback address. The selected port is written to the application log.
 
 ## JavaScript tests
 
@@ -142,7 +98,7 @@ npm install
 npm test
 ```
 
-The tests cover dataframe parsing and the client-side analysis modules. The `appdmg` dependency is macOS-only; Windows development environments may need to install the JavaScript test dependencies using a platform-aware npm setup or run the full dependency install on macOS/CI.
+The tests cover dataframe parsing, serial adapters, and the client-side analysis modules.
 
 ## GitHub Actions
 
@@ -152,7 +108,7 @@ GitHub Actions runs automatically for:
 - Pushes to `main`.
 - Release tags matching `v*.*.*`, such as `v1.0.0`.
 
-Pull requests and `main` pushes run Go formatting, tests, vet, builds, JavaScript syntax checks, and Jest. A version tag builds a Windows package containing `webmemsfcr.exe` and its required `resources` directory, then publishes the ZIP file to a GitHub Release. The release workflow uses GitHub-hosted runners and does not require external deployment credentials.
+Pull requests and `main` pushes run Rust formatting, tests, builds, JavaScript syntax checks, and Jest. A version tag builds a Tauri Windows package and publishes it to a GitHub Release. The release workflow uses GitHub-hosted runners and does not require external deployment credentials.
 
 ## Importing and testing a log
 

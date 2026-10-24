@@ -209,6 +209,7 @@ function updateReplayControls() {
     const conditionBar = document.getElementById("replay-condition-bar");
     const summary = document.getElementById("replay-condition-summary");
     const frameCount = dataframeLog.dataframes.length;
+    document.querySelector(".dashboard-replay")?.classList.toggle("is-empty", frameCount === 0);
 
     if (progress !== null) {
         progress.max = Math.max(0, frameCount - 1);

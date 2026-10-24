@@ -3,7 +3,7 @@
     <span>Gauges show the current ECU reading. Coloured bands indicate expected or warning ranges for the condition shown; detailed fault rules remain available on the Analysis tab.</span>
 </div>
 
-<div class="dashboard-replay card p-3 mb-3">
+<div class="dashboard-replay card p-3 mb-3 is-empty">
     <div class="d-flex flex-wrap align-items-center gap-2">
         <strong>Log replay</strong>
         <button id="replay-toggle-button" class="btn btn-primary has-logged-data replay-control" disabled>Play</button>
@@ -14,12 +14,12 @@
             <option value="2">2x</option>
             <option value="5">5x</option>
         </select>
+        <small id="replay-position" class="text-muted">Import a log to replay dashboard data.</small>
     </div>
     <label for="replay-progress" class="visually-hidden">Replay progress</label>
     <input id="replay-progress" class="form-range mt-2 has-logged-data replay-control" type="range" min="0" max="0" value="0" disabled>
     <div id="replay-condition-bar" class="replay-condition-bar" aria-label="Replay conditions"></div>
     <small id="replay-condition-summary" class="text-muted"></small>
-    <small id="replay-position" class="text-muted">Import a log to replay dashboard data.</small>
 </div>
 
 <div class="dashboard-gauges">
