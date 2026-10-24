@@ -322,8 +322,12 @@ function refreshStatus(entry) {
     for (let i = 0; i < elements.length; i++) {
         if (entry.state) {
             elements[i].innerHTML = entry.on;
+            elements[i].classList.add("is-fault");
+            elements[i].classList.remove("is-ok", "is-unknown");
         } else {
             elements[i].innerHTML = entry.off;
+            elements[i].classList.add("is-ok");
+            elements[i].classList.remove("is-fault", "is-unknown");
         }
     }
 }

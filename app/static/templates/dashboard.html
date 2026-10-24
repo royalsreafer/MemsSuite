@@ -121,4 +121,25 @@
         <div class="gauge-status is-unknown">Waiting for data</div>
         <div class="dashboard-spark-container"><canvas title="Ignition advance history" class="ecuspark _80x16_IgnitionAdvance"></canvas></div>
     </div>
+    <section class="dashboard-gauge dashboard-fault-status" aria-labelledby="dashboard-fault-status-title">
+        <div id="dashboard-fault-status-title" class="gauge-title">Circuit and sensor status</div>
+        <div class="dashboard-fault-status-grid">
+            <div class="dashboard-fault-status-item">
+                <span>Coolant sensor</span>
+                <strong class="ecudata_CoolantTempSensorFault dashboard-fault-status-value is-unknown">Waiting for data</strong>
+            </div>
+            <div class="dashboard-fault-status-item">
+                <span>Intake-air temperature sensor</span>
+                <strong class="ecudata_IntakeAirTempSensorFault dashboard-fault-status-value is-unknown">Waiting for data</strong>
+            </div>
+            <div class="dashboard-fault-status-item">
+                <span>Fuel pump circuit</span>
+                <strong class="ecudata_FuelPumpCircuitFault dashboard-fault-status-value is-unknown">Waiting for data</strong>
+            </div>
+            <div class="dashboard-fault-status-item">
+                <span>Throttle potentiometer circuit</span>
+                <strong class="ecudata_ThrottlePotCircuitFault dashboard-fault-status-value is-unknown">Waiting for data</strong>
+            </div>
+        </div>
+    </section>
 </div>

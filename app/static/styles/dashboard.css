@@ -4,6 +4,42 @@
     gap: .5rem;
 }
 
+.dashboard-fault-status-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: .75rem;
+}
+
+.dashboard-fault-status-item {
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+    padding: .75rem;
+    border: 1px solid #dee2e6;
+    border-radius: .35rem;
+}
+
+.dashboard-fault-status-value {
+    padding: .25rem .5rem;
+    border-radius: .25rem;
+    font-size: .9rem;
+}
+
+.dashboard-fault-status-value.is-unknown {
+    color: #6c757d;
+    background: #f1f3f5;
+}
+
+.dashboard-fault-status-value.is-ok {
+    color: #146c2e;
+    background: #d1e7dd;
+}
+
+.dashboard-fault-status-value.is-fault {
+    color: #842029;
+    background: #f8d7da;
+}
+
 .communication-health[data-stream-state="stale"] {
     border-color: #ffc107;
 }
