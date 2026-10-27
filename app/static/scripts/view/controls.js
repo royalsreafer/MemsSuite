@@ -111,7 +111,10 @@ function reset() {
 function downloadLog() {
     console.info(`download csv`);
 
-    dataframeLog.downloadCSVFile(ecu.ecuId);
+    dataframeLog.downloadCSVFile(ecu.ecuId).catch((error) => {
+        console.error(`download csv ${error}`);
+        View.showToast(`Unable to save log: ${error.message}`);
+    });
 }
 
 function importLog(event) {
@@ -185,5 +188,4 @@ export function resetReceived(ecuResponse) {
             break;
     }
 }
-
 

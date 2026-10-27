@@ -1,6 +1,8 @@
 use serialport::{ClearBuffer, DataBits, FlowControl, Parity, SerialPort, StopBits};
 use std::{
+    fs,
     io::{Read, Write},
+    path::Path,
     sync::Mutex,
     thread,
     time::{Duration, Instant},
@@ -166,6 +168,16 @@ fn send_command(
     Ok(response)
 }
 
+#[tauri::command]
+fn save_csv(path: String, contents: String) -> Result<(), String> {
+    let path = Path::new(&path);
+    if path.extension().and_then(|extension| extension.to_str()) != Some("csv") {
+        return Err("CSV files must use the .csv extension".to_string());
+    }
+
+    fs::write(path, contents).map_err(|error| format!("Unable to save CSV file: {error}"))
+}
+
 fn normalize_port(mut port: String) -> String {
     for prefix in ["mems:", "loopback:", "file:"] {
         if let Some(stripped) = port.strip_prefix(prefix) {
@@ -278,12 +290,14 @@ mod tests {
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .manage(AppState::default())
         .invoke_handler(tauri::generate_handler![
             get_available_ports,
             connect,
             disconnect,
-            send_command
+            send_command,
+            save_csv
         ])
         .run(tauri::generate_context!())
         .expect("error while running MemsSuite");

@@ -12,6 +12,7 @@ tauri-build = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 serialport = { version = "4.7", default-features = false }
 tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
 
 [profile.release]
 panic = "abort"

@@ -53,11 +53,13 @@ export class DataframeLog {
         }
     }
 
-    downloadCSVFile(ecuId) {
+    async downloadCSVFile(ecuId) {
         let csv = this._convertToCSV(this._dataframes);
-        this._exportCSV(csv, ecuId);
+        const exported = await this._exportCSV(csv, ecuId);
 
-        console.info('exported csv file');
+        if (exported) {
+            console.info('exported csv file');
+        }
     }
 
     //
@@ -166,19 +168,32 @@ export class DataframeLog {
     }
 
     //
-    // create a hidden link in the document, attach the url for the file data
-    // and call the click() function to download the file
+    // Use the native save dialog in the Tauri desktop app. Browser mode keeps
+    // using the standard download flow.
     //
-    _exportCSV(csv, ecuId) {
+    async _exportCSV(csv, ecuId) {
+        const filename = this._getFilename(ecuId);
+        const tauri = window.__TAURI__;
+        if (tauri?.dialog?.save && tauri?.core?.invoke) {
+            const path = await tauri.dialog.save({
+                defaultPath: filename,
+                filters: [{name: "CSV files", extensions: ["csv"]}]
+            });
+
+            if (path === null) {
+                return false;
+            }
+
+            await tauri.core.invoke("save_csv", {path, contents: csv});
+            return true;
+        }
+
         let link = document.createElement("a");
 
         if (link.download !== undefined) {
             // create a 'file' for download from the csv data
             let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             let url = URL.createObjectURL(blob);
-
-            // generate a filename
-            let filename = this._getFilename(ecuId);
 
             // update the link with the relevant attributes
             link.setAttribute("href", url);
@@ -192,7 +207,10 @@ export class DataframeLog {
             // tidy up
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
+            return true;
         }
+
+        return false;
     }
 
     _getFilename(ecuId) {
