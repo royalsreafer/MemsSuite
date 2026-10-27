@@ -1,5 +1,6 @@
 import * as Identifier from "./identifiers.js";
 import {analysisReport, dataframeLog, ecu} from "./init.js";
+import {communicationDiagnostics} from "../rosco/mems-communication-diagnostics.js";
 
 export function showToast(message) {
     let alertText = window.document.getElementById(Identifier.alertToastTextId);
@@ -40,6 +41,11 @@ export function setButtonsWhenDataHasBeenLogged() {
     for (let i = 0; i < control.length; i++) {
         control[i].disabled = !(dataframeLog.hasLoggedData);
     }
+
+    control = document.querySelectorAll(`.${Identifier.hasSessionDataClass}`);
+    for (let i = 0; i < control.length; i++) {
+        control[i].disabled = communicationDiagnostics.getSnapshot().framesReceived === 0;
+    }
 }
 
 export function setButtonsOnConnectionState() {
@@ -71,6 +77,5 @@ export function getButtonText(id) {
 
     return text;
 }
-
 
 

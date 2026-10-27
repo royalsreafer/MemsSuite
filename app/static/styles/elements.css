@@ -54,7 +54,8 @@ body {
 
 .page-footer.is-collapsed > .footer-copyright,
 .page-footer.is-collapsed #communication-health-metrics,
-.page-footer.is-collapsed #downloadSupportLogButton {
+.page-footer.is-collapsed #downloadSupportLogButton,
+.page-footer.is-collapsed #newDiagnosticSessionButton {
     display: none;
 }
 

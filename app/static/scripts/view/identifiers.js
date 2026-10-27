@@ -2,6 +2,7 @@ export const actuatorClass = "actuator";
 export const adjustmentClass = "adjustment";
 export const ecuControlClass = "ecu-control";
 export const hasLoggedDataClass= "has-logged-data";
+export const hasSessionDataClass = "has-session-data";
 export const analysisClass = "analysis";
 
 export const alertToastId = "alert-toast";
@@ -47,4 +48,3 @@ export const actuatorFan2 = 'actuate_fan_2';
 export const actuatorInjector = 'actuate_injector';
 export const actuatorCoil = 'actuate_coil';
 export const actuatorRpmGauge = 'actuate_rpm_gauge';
-

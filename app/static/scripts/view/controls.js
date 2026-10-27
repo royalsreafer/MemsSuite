@@ -4,6 +4,7 @@ import * as View from "./view.js";
 import * as Dataframe from "./dataframe.js";
 import * as LocalSerialPort from "./local-serialport.js";
 import {downloadSupportLog, refreshCommunicationHealth} from "./communication-health.js";
+import {communicationDiagnostics} from "../rosco/mems-communication-diagnostics.js";
 import {ecu, ecuVersion, setECU, isLocal, sendCommand, dataframeLog, logControl} from "./init.js";
 
 export function attachControlEventListeners() {
@@ -20,6 +21,7 @@ export function attachControlEventListeners() {
             connected: ecu.isConnected,
         });
     });
+    document.getElementById("newDiagnosticSessionButton").addEventListener('click', startNewDiagnosticSession);
     document.getElementById("importLogButton").addEventListener('click', () => document.getElementById("importLogFile").click());
     document.getElementById("importLogFile").addEventListener('change', importLog);
     document.getElementById("replay-toggle-button")?.addEventListener("click", Dataframe.toggleReplay);
@@ -35,6 +37,13 @@ export function attachControlEventListeners() {
     if (isLocal) {
         document.getElementById("selectPortConnectButton").addEventListener('click', LocalSerialPort.connectLocalSerialPort);
     }
+}
+
+function startNewDiagnosticSession() {
+    communicationDiagnostics.reset();
+    View.setButtonsWhenDataHasBeenLogged();
+    refreshCommunicationHealth(ecu.isConnected);
+    View.showToast("Started new diagnostic session");
 }
 
 function connect() {
@@ -188,4 +197,3 @@ export function resetReceived(ecuResponse) {
             break;
     }
 }
-

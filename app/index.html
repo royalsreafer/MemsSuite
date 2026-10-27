@@ -98,10 +98,11 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-2 text-nowrap">
+                        <div class="col-4 text-nowrap">
                             <button id="connectButton" class="btn btn-success ecu-control ecu-enabled-disconnected" type="button">Connect</button>
                             <button id="disconnectButton" class="btn btn-danger ecu-control ecu-enabled-connected" disabled>Disconnect</button>
                             <button id="pauseButton" class="btn btn-warning ecu-control ecu-enabled-connected" disabled>Pause</button>
+                            <button id="newDiagnosticSessionButton" class="btn btn-outline-primary has-session-data" type="button" title="Clear communication diagnostics and start a new session" disabled>New Session</button>
                             <button id="downloadLogButton" class="btn btn-secondary has-logged-data" disabled>Download Log</button>
                             <button id="importLogButton" class="btn btn-secondary ecu-control ecu-enabled-disconnected" type="button">Import Log</button>
                             <input id="importLogFile" type="file" accept=".csv,text/csv" class="d-none">
