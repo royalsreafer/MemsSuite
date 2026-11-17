@@ -1,6 +1,6 @@
 [package]
 name = "memssuite"
-version = "1.0.0"
+version = "0.0.3"
 description = "Rover MEMS ECU diagnostics"
 authors = ["Andrew Jackson"]
 edition = "2021"

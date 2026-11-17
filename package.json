@@ -1,6 +1,6 @@
 {
   "name": "memssuite",
-  "version": "1.0.0",
+  "version": "0.0.3",
   "type": "module",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathIgnorePatterns=/dist/"

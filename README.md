@@ -106,7 +106,7 @@ GitHub Actions runs automatically for:
 
 - Pull requests targeting `main`.
 - Pushes to `main`.
-- Release tags matching `v*.*.*`, such as `v1.0.0`.
+- Release tags matching `v*.*.*`, such as `v0.0.3`.
 
 Pull requests and `main` pushes run Rust formatting, tests, builds, JavaScript syntax checks, and Jest. A version tag builds a Tauri Windows package and publishes it to a GitHub Release. The release workflow uses GitHub-hosted runners and does not require external deployment credentials.
 
