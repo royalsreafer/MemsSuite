@@ -332,6 +332,7 @@ export function update(df, faults = {}, status = undefined) {
     const crankshaftFaultLed = document.getElementById("dashboard-crankshaft-fault");
     const mapFaultLed = document.getElementById("dashboard-map-fault");
     const lambdaLoopLed = document.getElementById("dashboard-lambda-loop");
+    const lambdaGauge = document.getElementById("dashboard-lambda-gauge");
     if (engineRunningLed !== null && status !== undefined) {
         engineRunningLed.className = `status-led ${status.isEngineRunning ? "is-on" : "is-off"}`;
     }
@@ -343,6 +344,9 @@ export function update(df, faults = {}, status = undefined) {
     }
     if (lambdaLoopLed !== null && status !== undefined) {
         lambdaLoopLed.className = `status-led ${status.isLoopClosed ? "is-on" : "is-off"}`;
+    }
+    if (lambdaGauge !== null) {
+        lambdaGauge.classList.toggle("is-closed-loop", status?.isLoopClosed === true);
     }
 }
 

@@ -161,6 +161,72 @@ export function createCharts() {
         chartCtx.addEventListener("wheel", scrollCharts, {passive: false});
         charts.push(graph);
     }
+    createChartVisibilityControls();
+}
+
+function createChartVisibilityControls() {
+    const options = document.getElementById("chart-visibility-options");
+    if (options === null) {
+        return;
+    }
+
+    const chartElements = document.querySelectorAll(`.${Identifier.ecuDataChart}`);
+    chartElements.forEach((chartElement, index) => {
+        const metricId = chartElement.classList[1];
+        const inputId = `chart-visibility-${index}`;
+        const wrapper = chartElement.closest(".position-relative");
+        const option = document.createElement("div");
+        option.className = "form-check";
+
+        const input = document.createElement("input");
+        input.className = "form-check-input";
+        input.type = "checkbox";
+        input.id = inputId;
+        input.checked = true;
+        input.dataset.metricId = metricId;
+        input.addEventListener("change", () => {
+            setChartVisibility(metricId, input.checked);
+        });
+
+        const label = document.createElement("label");
+        label.className = "form-check-label";
+        label.htmlFor = inputId;
+        label.textContent = chartElement.title;
+
+        option.append(input, label);
+        options.append(option);
+
+        if (wrapper !== null) {
+            wrapper.dataset.chartMetric = metricId;
+        }
+    });
+
+    document.getElementById("show-all-charts-button")?.addEventListener("click", () => {
+        setAllChartsVisibility(true);
+    });
+    document.getElementById("hide-all-charts-button")?.addEventListener("click", () => {
+        setAllChartsVisibility(false);
+    });
+}
+
+function setAllChartsVisibility(visible) {
+    document.querySelectorAll("#chart-visibility-options input").forEach((input) => {
+        input.checked = visible;
+        setChartVisibility(input.dataset.metricId, visible);
+    });
+}
+
+function setChartVisibility(metricId, visible) {
+    const wrapper = document.querySelector(`[data-chart-metric="${metricId}"]`);
+    if (wrapper !== null) {
+        wrapper.hidden = !visible;
+    }
+
+    const chart = findChart(`${Identifier.ecuDataChart} ${metricId}`);
+    if (chart !== undefined) {
+        chart.resize();
+        chart.update("none");
+    }
 }
 
 export function createSparks() {
@@ -466,11 +532,11 @@ export function addData(chart, label, data, fault, render = true) {
     chart._history.labels.push(label);
     chart._history.data.push(data);
     chart._history.faults.push(fault === true ? data : NaN);
-
     if (render) {
         renderChartWindow(chart);
         chart.update('none');
     }
+
 }
 
 export function findChart(id) {

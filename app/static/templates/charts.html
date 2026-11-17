@@ -5,6 +5,15 @@
 	<small class="w-100 text-muted">Drag the slider or use the mouse wheel over a chart to view older data.</small>
 </div>
 
+<fieldset id="chart-visibility-controls" class="chart-visibility alert alert-light border mb-3">
+	<legend class="fs-6 fw-bold mb-2">Visible charts</legend>
+	<div class="d-flex flex-wrap gap-2 mb-2">
+		<button id="show-all-charts-button" class="btn btn-sm btn-outline-secondary" type="button">Show all</button>
+		<button id="hide-all-charts-button" class="btn btn-sm btn-outline-secondary" type="button">Hide all</button>
+	</div>
+	<div id="chart-visibility-options" class="d-flex flex-wrap gap-3" aria-label="Chart visibility options"></div>
+</fieldset>
+
 <div class="position-relative">
 	<div class="chart-container"><canvas title="80x01 RPM" class="ecuchart _80x01_EngineRPM" height="150"></canvas></div>
 	<div class="position-absolute top-50 end-0 m-3 ecudata-label">80x01 RPM</div>

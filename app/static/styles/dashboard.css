@@ -229,6 +229,11 @@
     box-shadow: 0 0 5px rgba(25, 135, 84, .7);
 }
 
+.dashboard-gauge.is-closed-loop {
+    border-color: #198754;
+    box-shadow: 0 0 0 .2rem rgba(25, 135, 84, .2);
+}
+
 .status-led.is-fault {
     border-color: #842029;
     background: #dc3545;

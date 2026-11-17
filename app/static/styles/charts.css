@@ -61,9 +61,15 @@
 }
 
 .chart-navigation {
-    position: sticky;
-    top: 0;
-    z-index: 2;
+    position: static;
+}
+
+.chart-visibility {
+    position: static;
+}
+
+.chart-visibility-options .form-check {
+    min-width: 180px;
 }
 
 .ecuchart {
